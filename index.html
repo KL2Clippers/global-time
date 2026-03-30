@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GLOBAL OPS — World Time Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -30,10 +29,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
 /* MAP SECTION */
 .top-section{display:grid;grid-template-columns:1fr 340px;gap:16px;margin-top:24px}
 .panel{background:var(--card);border:1px solid var(--border-bright);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden}
-.map-container{position:relative;width:100%;aspect-ratio:2/1;background:#0d111a;border-radius:8px;overflow:hidden}
-/* 실제 세계지도 이미지를 배경으로 사용 */
-.world-bg{position:absolute;width:100%;height:100%;opacity:0.3;object-fit:contain;filter:invert(1) brightness(0.5);}
-#pinsLayer{position:absolute;inset:0;z-index:2}
+.map-container{position:relative;width:100%;background:#0d111a;border-radius:8px;padding-bottom:50%;}
+#pinsLayer{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2}
 
 /* CARDS */
 .regions{margin-top:32px;display:flex;flex-direction:column;gap:32px}
@@ -73,8 +70,10 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
     <div class="panel">
       <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase">🌍 Global Market Presence</div>
       <div class="map-container">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" class="world-bg" alt="World Map">
-        <svg id="pinsLayer" viewBox="0 0 1000 500"></svg>
+        <svg id="pinsLayer" viewBox="0 0 1010 666" preserveAspectRatio="xMidYMid meet">
+            <image href="https://simplemaps.com/static/svg/world/world.svg" width="1010" height="666" opacity="0.3" style="filter: invert(1) brightness(0.6);"/>
+            <g id="dotsGroup"></g>
+        </svg>
       </div>
     </div>
     <div class="panel" style="display:flex;flex-direction:column;justify-content:center;text-align:center;">
@@ -96,123 +95,42 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
 </div>
 
 <script>
+// 위도/경도를 이 지도의 전용 좌표(1010x666)로 변환하는 공식 적용
 const REGIONS=[
   {id:'am',label:'Americas',color:'#4a9fff',cities:[
-    {name:'Dominican Republic',tz:'America/Santo_Domingo',lat:18.4,lon:-69.9, country:'DOM'},
-    {name:'Los Angeles',tz:'America/Los_Angeles',lat:34.0,lon:-118.2, country:'USA'},
-    {name:'San Francisco',tz:'America/Los_Angeles',lat:37.7,lon:-122.4, country:'USA'}
+    {name:'Dominican Rep.',tz:'America/Santo_Domingo',lat:18.7,lon:-70.1},
+    {name:'Los Angeles',tz:'America/Los_Angeles',lat:34.0,lon:-118.2},
+    {name:'San Francisco',tz:'America/Los_Angeles',lat:37.7,lon:-122.4}
   ]},
   {id:'eu',label:'Europe',color:'#a78bfa',cities:[
-    {name:'Amsterdam',tz:'Europe/Amsterdam',lat:52.3,lon:4.9, country:'NED'},
-    {name:'Barcelona',tz:'Europe/Madrid',lat:41.3,lon:2.1, country:'SPA'},
-    {name:'Geneva',tz:'Europe/Zurich',lat:46.2,lon:6.1, country:'SUI'},
-    {name:'London',tz:'Europe/London',lat:51.5,lon:-0.1, country:'UK'},
-    {name:'Moscow',tz:'Europe/Moscow',lat:55.7,lon:37.6, country:'RUS'},
-    {name:'Stockholm',tz:'Europe/Stockholm',lat:59.3,lon:18.0, country:'SWE'}
+    {name:'Amsterdam',tz:'Europe/Amsterdam',lat:52.3,lon:4.9},
+    {name:'Barcelona',tz:'Europe/Madrid',lat:41.3,lon:2.1},
+    {name:'Geneva',tz:'Europe/Zurich',lat:46.2,lon:6.1},
+    {name:'London',tz:'Europe/London',lat:51.5,lon:-0.1},
+    {name:'Moscow',tz:'Europe/Moscow',lat:55.7,lon:37.6},
+    {name:'Stockholm',tz:'Europe/Stockholm',lat:59.3,lon:18.0}
   ]},
   {id:'me',label:'Middle East & Africa',color:'#ffb340',cities:[
-    {name:'Angola',tz:'Africa/Luanda',lat:-8.8,lon:13.2, country:'ANG'},
-    {name:'Dubai',tz:'Asia/Dubai',lat:25.2,lon:55.2, country:'UAE'},
-    {name:'Istanbul',tz:'Europe/Istanbul',lat:41.0,lon:28.9, country:'TUR'},
-    {name:'Riyadh',tz:'Asia/Riyadh',lat:24.6,lon:46.7, country:'KSA'}
+    {name:'Angola',tz:'Africa/Luanda',lat:-8.8,lon:13.2},
+    {name:'Dubai',tz:'Asia/Dubai',lat:25.2,lon:55.2},
+    {name:'Istanbul',tz:'Europe/Istanbul',lat:41.0,lon:28.9},
+    {name:'Riyadh',tz:'Asia/Riyadh',lat:24.6,lon:46.7}
   ]},
   {id:'as',label:'Asia & Oceania',color:'#00d4aa',cities:[
-    {name:'Melbourne',tz:'Australia/Melbourne',lat:-37.8,lon:144.9, country:'AUS'},
-    {name:'Mumbai',tz:'Asia/Kolkata',lat:19.0,lon:72.8, country:'IND'},
-    {name:'Shanghai',tz:'Asia/Shanghai',lat:31.2,lon:121.4, country:'CHN'},
-    {name:'Sydney',tz:'Australia/Sydney',lat:-33.8,lon:151.2, country:'AUS'},
-    {name:'Seoul',tz:'Asia/Seoul',lat:37.5,lon:127.0, country:'KOR'}
+    {name:'Melbourne',tz:'Australia/Melbourne',lat:-37.8,lon:144.9},
+    {name:'Mumbai',tz:'Asia/Kolkata',lat:19.0,lon:72.8},
+    {name:'Shanghai',tz:'Asia/Shanghai',lat:31.2,lon:121.4},
+    {name:'Sydney',tz:'Australia/Sydney',lat:-33.8,lon:151.2},
+    {name:'Seoul',tz:'Asia/Seoul',lat:37.5,lon:127.0}
   ]}
 ];
 
 let calcOffset = 0;
-// 지도의 메르카토르 도법을 고려한 보정 상숫값
-const xy=(lat,lon)=>{
-    const x = (lon + 180) * (1000 / 360);
-    const y = (90 - lat) * (500 / 180);
-    return {x, y};
-};
 
-function buildDashboard() {
-  const wrap = document.getElementById('regionsWrap');
-  const pins = document.getElementById('pinsLayer');
-  wrap.innerHTML = ''; pins.innerHTML = '';
-
-  REGIONS.forEach(reg => {
-    const sec = document.createElement('div');
-    sec.innerHTML = `<div class="region-hdr"><div class="r-tag" style="color:${reg.color};border-color:${reg.color}66">${reg.label}</div><div class="r-line"></div></div><div class="cards-grid" id="grid-${reg.id}"></div>`;
-    wrap.appendChild(sec);
-
-    reg.cities.forEach((c, i) => {
-      if(c.name !== 'Seoul') {
-          const grid = document.getElementById(`grid-${reg.id}`);
-          const card = document.createElement('div');
-          card.className = 'c-card';
-          card.innerHTML = `<div class="c-top"><div><div class="c-name">${c.name}</div><div style="font-size:10px;color:var(--text-muted)">${c.country}</div></div><div class="w-ind" id="wi-${reg.id}-${i}">● OFF</div></div><div class="c-time" id="ct-${reg.id}-${i}">--:--</div><div style="font-size:10px;color:var(--text-dim)" id="cd-${reg.id}-${i}">--</div>`;
-          grid.appendChild(card);
-      }
-
-      const pos = xy(c.lat, c.lon);
-      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      dot.setAttribute("cx", pos.x); dot.setAttribute("cy", pos.y); dot.setAttribute("r", 4);
-      dot.setAttribute("fill", reg.color);
-      dot.innerHTML = `<title>${c.name}</title>`;
-      pins.appendChild(dot);
-      
-      const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      txt.setAttribute("x", pos.x + 6); txt.setAttribute("y", pos.y + 3);
-      txt.setAttribute("fill", "#fff"); txt.setAttribute("font-size", "10");
-      txt.setAttribute("font-weight", "600");
-      txt.style.textShadow = "0 0 3px #000";
-      txt.textContent = c.name;
-      pins.appendChild(txt);
-    });
-  });
-}
-
-function update() {
-  const now = new Date(Date.now() + calcOffset);
-  const seoulTime = now.toLocaleTimeString('en-GB', {timeZone:'Asia/Seoul'});
-  document.getElementById('hdrTime').textContent = seoulTime;
-  document.getElementById('seoulTime').textContent = seoulTime;
-  document.getElementById('seoulDate').textContent = now.toLocaleDateString('ko-KR', {weekday:'long', month:'long', day:'numeric'});
-
-  REGIONS.forEach(reg => {
-    reg.cities.forEach((c, i) => {
-      const timeStr = now.toLocaleTimeString('en-GB', {timeZone:c.tz, hour:'2-digit', minute:'2-digit'});
-      const hour = parseInt(timeStr.split(':')[0]);
-      const cardTime = document.getElementById(`ct-${reg.id}-${i}`);
-      if(cardTime) cardTime.textContent = timeStr;
-      
-      const cardDate = document.getElementById(`cd-${reg.id}-${i}`);
-      if(cardDate) cardDate.textContent = now.toLocaleDateString('en-GB', {timeZone:c.tz, month:'short', day:'numeric'});
-      
-      const isOpen = hour >= 9 && hour < 18;
-      const ind = document.getElementById(`wi-${reg.id}-${i}`);
-      if(ind) {
-        ind.textContent = isOpen ? '● OPEN' : '● OFF';
-        ind.className = `w-ind ${isOpen ? 'on' : 'off'}`;
-      }
-    });
-  });
-}
-
-function applyCalc() {
-  const val = document.getElementById('calcIn').value;
-  if(!val) return;
-  const [h, m] = val.split(':').map(Number);
-  const seoulNow = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
-  const target = new Date(seoulNow);
-  target.setHours(h, m, 0, 0);
-  calcOffset = target - seoulNow;
-  update();
-}
-
-function resetCalc() { calcOffset = 0; update(); }
-
-buildDashboard();
-setInterval(update, 1000);
-update();
-</script>
-</body>
-</html>
+// 이 지도의 특수한 좌표계(SimpleMaps 1010x666)에 맞춘 변환 함수
+function getMapPos(lat, lon) {
+    const x = (lon + 180) * (1010 / 360);
+    const latRad = lat * Math.PI / 180;
+    const mercN = Math.log(Math.tan((Math.PI / 4) + (latRad / 2)));
+    const y = (666 / 2) - (1010 * mercN / (2 * Math.PI));
+    return { x
