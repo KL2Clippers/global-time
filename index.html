@@ -9,230 +9,193 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@200;300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#080a0f;--bg2:#0d1018;--bg3:#131620;
-  --card:#10131c;--card-hover:#161a27;
+  --bg:#080a0f;--bg2:#0d1018;--card:#10131c;--card-hover:#161a27;
   --border:rgba(255,255,255,0.06);--border-bright:rgba(255,255,255,0.12);
   --text:#e8eaf0;--text-muted:#5a6070;--text-dim:#3a4050;
-  --accent-blue:#4a9fff;--accent-cyan:#00d4aa;--accent-amber:#ffb340;--accent-rose:#ff6b6b;
-  --active:#00e887;--active-glow:rgba(0,232,135,0.2);--inactive:#2a3040;
+  --accent-blue:#4a9fff;--accent-cyan:#00d4aa;--accent-amber:#ffb340;
+  --active:#00e887;--inactive:#2a3040;
   --region-am:#4a9fff;--region-eu:#a78bfa;--region-me:#ffb340;--region-as:#00d4aa;--region-kr:#ff6b9d;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 800px 500px at 15% 20%,rgba(74,159,255,.04) 0%,transparent 70%),radial-gradient(ellipse 600px 400px at 85% 70%,rgba(167,139,250,.04) 0%,transparent 70%);pointer-events:none;z-index:0}
-.wrapper{position:relative;z-index:1;max-width:1480px;margin:0 auto;padding:0 24px 80px}
-header{display:flex;align-items:center;justify-content:space-between;padding:28px 0 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:16px}
+.wrapper{max-width:1480px;margin:0 auto;padding:0 24px 80px}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:28px 0 20px;border-bottom:1px solid var(--border)}
 .logo-group{display:flex;align-items:center;gap:14px}
-.logo-mark{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000;flex-shrink:0}
+.logo-mark{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000}
 .logo-text{font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
-.logo-sub{font-size:11px;letter-spacing:.12em;color:var(--text-muted);text-transform:uppercase;margin-top:2px}
-.header-right{display:flex;align-items:center;gap:16px}
 .seoul-hdr{text-align:right}
-.seoul-hdr-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px}
-.seoul-hdr-time{font-family:'DM Mono',monospace;font-size:22px;font-weight:400;color:var(--accent-cyan);letter-spacing:.04em;line-height:1}
-.seoul-hdr-date{font-size:11px;color:var(--text-muted);margin-top:3px;font-family:'DM Mono',monospace;letter-spacing:.06em}
-.status-dot{width:8px;height:8px;border-radius:50%;background:var(--active);box-shadow:0 0 8px var(--active),0 0 16px var(--active-glow);animation:blink 2s ease-in-out infinite;flex-shrink:0}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.6}}
-.top-section{display:grid;grid-template-columns:1fr 340px;gap:16px;margin-top:24px;align-items:start}
+.seoul-hdr-time{font-family:'DM Mono',monospace;font-size:22px;color:var(--accent-cyan)}
+
+/* MAP PANEL - 육지가 표시되도록 개선 */
+.top-section{display:grid;grid-template-columns:1fr 340px;gap:16px;margin-top:24px}
 .panel{background:var(--card);border:1px solid var(--border-bright);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden}
-.panel-accent{position:absolute;top:0;left:0;right:0;height:1px}
-.panel-hdr{display:flex;align-items:center;gap:8px;margin-bottom:14px}
-.panel-title{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted)}
-#worldSvg{width:100%;height:auto;display:block;border-radius:8px}
-.right-col{display:flex;flex-direction:column;gap:14px}
-.seoul-panel{background:var(--card);border:1px solid rgba(255,109,157,.22);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden}
-.seoul-panel .panel-accent{background:linear-gradient(90deg,transparent,var(--region-kr),transparent);opacity:.7}
-.seoul-tag{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--region-kr);opacity:.85;margin-bottom:6px}
-.seoul-city{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.01em}
-.seoul-big-time{font-family:'DM Mono',monospace;font-size:38px;font-weight:400;color:#fff;letter-spacing:-.03em;line-height:1}
-.seoul-big-date{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:.06em;margin-top:6px}
-.seoul-badge{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:3px 10px;border-radius:100px;border:1px solid;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-.seoul-badge.on{color:var(--active);border-color:rgba(0,232,135,.3);background:rgba(0,232,135,.08)}
-.seoul-badge.off{color:var(--text-dim);border-color:var(--inactive)}
-.s-dot{width:5px;height:5px;border-radius:50%}
-.seoul-badge.on .s-dot{background:var(--active);box-shadow:0 0 5px var(--active);animation:blink 2s infinite}
-.calc-section{margin-top:16px;background:var(--card);border:1px solid var(--border-bright);border-radius:16px;padding:20px 24px;position:relative;overflow:hidden}
-.calc-section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent-blue),var(--accent-cyan),transparent);opacity:.6}
-.calc-hdr{display:flex;align-items:center;gap:10px;margin-bottom:15px}
-.calc-badge{display:none;align-items:center;gap:5px;background:rgba(255,179,64,.12);border:1px solid rgba(255,179,64,.3);border-radius:6px;padding:3px 10px;font-size:10px;color:var(--accent-amber);letter-spacing:.1em;font-weight:600}
-.calc-badge.on{display:flex}
-.calc-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.calc-lbl{font-size:12px;color:var(--text-muted);letter-spacing:.06em}
-.calc-time{background:var(--bg3);border:1px solid var(--border-bright);border-radius:8px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;padding:8px 14px;outline:none;width:148px}
-.calc-apply{background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));border:none;border-radius:8px;color:#000;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:9px 18px;cursor:pointer}
-.calc-reset{background:transparent;border:1px solid var(--border-bright);border-radius:8px;color:var(--text-muted);font-family:'Outfit',sans-serif;font-size:12px;padding:8px 14px;cursor:pointer}
-.regions{margin-top:24px;display:flex;flex-direction:column;gap:30px}
-.region-hdr{display:flex;align-items:center;gap:12px;margin-bottom:13px}
+#worldMap{width:100%;height:auto;background:#0d111a;border-radius:8px;display:block}
+.land{fill:#1e2533;stroke:#2d364a;stroke-width:0.5} /* 육지 색상 */
+
+/* CARDS */
+.regions{margin-top:32px;display:flex;flex-direction:column;gap:32px}
+.region-hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .r-line{flex:1;height:1px;background:var(--border)}
-.r-tag{display:flex;align-items:center;gap:7px;padding:4px 13px;border-radius:100px;border:1px solid;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
-.r-dot{width:6px;height:6px;border-radius:50%}
-.region-am .r-tag{color:var(--region-am);border-color:rgba(74,159,255,.3);background:rgba(74,159,255,.06)}
-.region-am .r-dot{background:var(--region-am)}
-.region-eu .r-tag{color:var(--region-eu);border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.06)}
-.region-eu .r-dot{background:var(--region-eu)}
-.region-me .r-tag{color:var(--region-me);border-color:rgba(255,179,64,.3);background:rgba(255,179,64,.06)}
-.region-me .r-dot{background:var(--region-me)}
-.region-as .r-tag{color:var(--region-as);border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.06)}
-.region-as .r-dot{background:var(--region-as)}
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:10px}
-.c-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;transition:all .2s}
+.r-tag{padding:4px 12px;border-radius:100px;border:1px solid;font-size:10px;font-weight:700;text-transform:uppercase}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.c-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:all .2s}
 .c-card:hover{background:var(--card-hover);transform:translateY(-2px)}
-.c-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:11px}
-.c-name{font-size:14px;font-weight:600;line-height:1.2}
-.c-country{font-size:10px;color:var(--text-muted);text-transform:uppercase;margin-top:2px}
-.w-ind{display:flex;align-items:center;gap:4px;padding:2px 7px;border-radius:100px;border:1px solid;font-size:9px;font-weight:700;text-transform:uppercase}
+.c-top{display:flex;justify-content:space-between;margin-bottom:12px}
+.c-name{font-size:15px;font-weight:600}
+.c-time{font-family:'DM Mono',monospace;font-size:28px;line-height:1;margin-bottom:6px}
+.w-ind{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:100px;border:1px solid}
 .w-ind.on{color:var(--active);border-color:rgba(0,232,135,.3);background:rgba(0,232,135,.08)}
 .w-ind.off{color:var(--text-dim);border-color:var(--inactive)}
-.w-dot{width:5px;height:5px;border-radius:50%}
-.w-ind.on .w-dot{background:var(--active);box-shadow:0 0 5px var(--active);animation:blink 2s infinite}
-.w-ind.off .w-dot{background:var(--text-dim)}
-.c-time{font-family:'DM Mono',monospace;font-size:26px;font-weight:400;line-height:1;margin-bottom:5px}
-.c-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted)}
-.c-offset{display:inline-flex;margin-top:7px;font-size:9px;color:var(--text-dim);font-family:'DM Mono',monospace}
-footer{margin-top:50px;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text-dim)}
-@media(max-width:1100px){.top-section{grid-template-columns:1fr}}
+
+/* CALCULATOR */
+.calc-section{margin-top:24px;background:var(--card);border:1px solid var(--accent-blue);border-radius:16px;padding:20px 24px}
+.calc-time{background:#1a1f2e;border:1px solid var(--border-bright);color:#fff;padding:8px;border-radius:6px;font-family:'DM Mono'}
+.calc-btn{background:var(--accent-blue);border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer}
 </style>
 </head>
 <body>
 <div class="wrapper">
-<header>
-  <div class="logo-group">
-    <div class="logo-mark">G</div>
-    <div>
-      <div class="logo-text">Global OPS</div>
-      <div class="logo-sub">World Time Dashboard</div>
+  <header>
+    <div class="logo-group">
+      <div class="logo-mark">G</div>
+      <div><div class="logo-text">Global OPS Dashboard</div></div>
     </div>
-  </div>
-  <div class="header-right">
     <div class="seoul-hdr">
-      <div class="seoul-hdr-label">🇰🇷 Seoul — KST (Base)</div>
-      <div class="seoul-hdr-time" id="hdrTime">--:--:--</div>
-      <div class="seoul-hdr-date" id="hdrDate">---</div>
+      <div style="font-size:10px;color:var(--text-muted)">SEOUL BASE</div>
+      <div class="seoul-hdr-time" id="hdrTime">00:00:00</div>
     </div>
-    <div class="status-dot"></div>
-  </div>
-</header>
-<div class="top-section">
-  <div class="panel map-panel">
-    <div class="panel-accent"></div>
-    <div class="panel-hdr"><span style="font-size:15px">🌍</span><span class="panel-title">Live City Map</span></div>
-    <svg id="worldSvg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
-      <rect width="1000" height="500" fill="#090c15" rx="8"/>
-      <g stroke="rgba(255,255,255,0.035)" stroke-width="0.6" fill="none">
-        <line x1="0" y1="83" x2="1000" y2="83"/><line x1="0" y1="250" x2="1000" y2="250"/><line x1="0" y1="417" x2="1000" y2="417"/>
-        <line x1="167" y1="0" x2="167" y2="500"/><line x1="500" y1="0" x2="500" y2="500"/><line x1="833" y1="0" x2="833" y2="500"/>
-      </g>
-      <g id="pinsLayer"></g>
-    </svg>
-  </div>
-  <div class="right-col">
-    <div class="seoul-panel">
-      <div class="panel-accent"></div>
-      <div class="seoul-tag">🏠 Home Base</div><div class="seoul-city">Seoul</div>
-      <div class="seoul-big-time" id="seoulBigTime">--:--:--</div>
-      <div class="seoul-big-date" id="seoulBigDate">---</div>
-      <div class="seoul-badge off" id="seoulBadge"><div class="s-dot"></div><span id="seoulBadgeLbl">OFF</span></div>
+  </header>
+
+  <div class="top-section">
+    <div class="panel">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase">🌍 Live Market Presence</div>
+      <svg id="worldMap" viewBox="0 0 1000 500">
+        <rect width="1000" height="500" fill="#0d111a"/>
+        <g class="land">
+          <path d="M160,100 L250,80 L350,150 L320,300 L200,450 L100,350 L50,150 Z"/> <path d="M450,50 L600,30 L800,50 L950,150 L850,350 L700,400 L500,350 L450,200 Z"/> <path d="M750,300 L850,300 L900,400 L800,450 Z"/> </g>
+        <g id="pinsLayer"></g>
+      </svg>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;justify-content:center;text-align:center;">
+        <div style="font-size:40px;margin-bottom:10px;">🇰🇷</div>
+        <div style="font-size:18px;font-weight:700;">Seoul, Korea</div>
+        <div id="seoulTime" style="font-size:32px;font-family:'DM Mono';color:var(--accent-cyan);margin:10px 0;">--:--:--</div>
+        <div id="seoulDate" style="font-size:12px;color:var(--text-muted);">---</div>
     </div>
   </div>
-</div>
-<div class="calc-section">
-  <div class="calc-hdr"><span style="font-size:15px">⏱</span><span class="panel-title">시차 계산기 — Seoul KST 기준</span><span class="calc-badge" id="calcBadge">⚡ PREVIEW</span></div>
-  <div class="calc-row">
-    <span class="calc-lbl">서울 시각 입력</span><input type="time" class="calc-time" id="calcIn">
-    <button class="calc-apply" onclick="applyCalc()">전체 적용</button><button class="calc-reset" onclick="resetCalc()">리셋</button>
+
+  <div class="calc-section">
+    <span style="font-size:13px;margin-right:15px;">⏱ 시차 계산기 (서울 기준):</span>
+    <input type="time" id="calcIn" class="calc-time">
+    <button class="calc-btn" onclick="applyCalc()">시간 적용</button>
+    <button onclick="resetCalc()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;margin-left:10px;">리셋</button>
   </div>
+
+  <div class="regions" id="regionsWrap"></div>
 </div>
-<div class="regions" id="regionsWrap"></div>
-<footer><span>© 2026 Global OPS Dashboard — 17 Cities Live</span></footer>
-</div>
+
 <script>
 const REGIONS=[
-  {id:'am',label:'Americas',cities:[
-    {name:'Dominican Republic',country:'Dominican Rep.', tz:'America/Santo_Domingo',lat:18.48, lon:-69.93},
-    {name:'Los Angeles', country:'USA', tz:'America/Los_Angeles', lat:34.05, lon:-118.24},
-    {name:'San Francisco', country:'USA', tz:'America/Los_Angeles', lat:37.77, lon:-122.42}
+  {id:'am',label:'Americas',color:'#4a9fff',cities:[
+    {name:'Dominican Republic',tz:'America/Santo_Domingo',lat:18.4,lon:-69.9, country:'DOM'},
+    {name:'Los Angeles',tz:'America/Los_Angeles',lat:34.0,lon:-118.2, country:'USA'},
+    {name:'San Francisco',tz:'America/Los_Angeles',lat:37.7,lon:-122.4, country:'USA'}
   ]},
-  {id:'eu',label:'Europe',cities:[
-    {name:'Amsterdam', country:'Netherlands', tz:'Europe/Amsterdam', lat:52.37, lon:4.90},
-    {name:'Barcelona', country:'Spain', tz:'Europe/Madrid', lat:41.38, lon:2.17},
-    {name:'Geneva', country:'Switzerland', tz:'Europe/Zurich', lat:46.20, lon:6.15},
-    {name:'London', country:'UK', tz:'Europe/London', lat:51.51, lon:-0.13},
-    {name:'Moscow', country:'Russia', tz:'Europe/Moscow', lat:55.75, lon:37.62},
-    {name:'Stockholm', country:'Sweden', tz:'Europe/Stockholm', lat:59.33, lon:18.07}
+  {id:'eu',label:'Europe',color:'#a78bfa',cities:[
+    {name:'Amsterdam',tz:'Europe/Amsterdam',lat:52.3,lon:4.9, country:'NED'},
+    {name:'Barcelona',tz:'Europe/Madrid',lat:41.3,lon:2.1, country:'SPA'},
+    {name:'Geneva',tz:'Europe/Zurich',lat:46.2,lon:6.1, country:'SUI'},
+    {name:'London',tz:'Europe/London',lat:51.5,lon:-0.1, country:'UK'},
+    {name:'Moscow',tz:'Europe/Moscow',lat:55.7,lon:37.6, country:'RUS'},
+    {name:'Stockholm',tz:'Europe/Stockholm',lat:59.3,lon:18.0, country:'SWE'}
   ]},
-  {id:'me',label:'Middle East & Africa',cities:[
-    {name:'Angola', country:'Angola', tz:'Africa/Luanda', lat:-8.83, lon:13.23},
-    {name:'Dubai', country:'UAE', tz:'Asia/Dubai', lat:25.20, lon:55.27},
-    {name:'Istanbul', country:'Türkiye', tz:'Europe/Istanbul', lat:41.01, lon:28.96},
-    {name:'Riyadh', country:'Saudi Arabia', tz:'Asia/Riyadh', lat:24.69, lon:46.72}
+  {id:'me',label:'Middle East & Africa',color:'#ffb340',cities:[
+    {name:'Angola',tz:'Africa/Luanda',lat:-8.8,lon:13.2, country:'ANG'},
+    {name:'Dubai',tz:'Asia/Dubai',lat:25.2,lon:55.2, country:'UAE'},
+    {name:'Istanbul',tz:'Europe/Istanbul',lat:41.0,lon:28.9, country:'TUR'},
+    {name:'Riyadh',tz:'Asia/Riyadh',lat:24.6,lon:46.7, country:'KSA'}
   ]},
-  {id:'as',label:'Asia & Oceania',cities:[
-    {name:'Melbourne', country:'Australia', tz:'Australia/Melbourne', lat:-37.81, lon:144.96},
-    {name:'Mumbai', country:'India', tz:'Asia/Kolkata', lat:19.08, lon:72.88},
-    {name:'Shanghai', country:'China', tz:'Asia/Shanghai', lat:31.23, lon:121.47},
-    {name:'Sydney', country:'Australia', tz:'Australia/Sydney', lat:-33.87, lon:151.21}
+  {id:'as',label:'Asia & Oceania',color:'#00d4aa',cities:[
+    {name:'Melbourne',tz:'Australia/Melbourne',lat:-37.8,lon:144.9, country:'AUS'},
+    {name:'Mumbai',tz:'Asia/Kolkata',lat:19.0,lon:72.8, country:'IND'},
+    {name:'Shanghai',tz:'Asia/Shanghai',lat:31.2,lon:121.4, country:'CHN'},
+    {name:'Sydney',tz:'Australia/Sydney',lat:-33.8,lon:151.2, country:'AUS'}
   ]}
 ];
-const SEOUL={name:'Seoul',country:'South Korea',tz:'Asia/Seoul',lat:37.57,lon:126.98};
-const RC={am:'#4a9fff',eu:'#a78bfa',me:'#ffb340',as:'#00d4aa',kr:'#ff6b9d'};
-let calcOffset=0;
-const getNow=()=>new Date(Date.now()+calcOffset);
+
+let calcOffset = 0;
 const xy=(lat,lon)=>({x:(lon+180)/360*1000, y:(90-lat)/180*500});
-const fmtT=(d,tz)=>d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
-const fmtD=(d,tz)=>d.toLocaleDateString('en-GB',{timeZone:tz,weekday:'short',month:'short',day:'numeric'});
-function isWork(d,tz){const p=d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).split(':'); const t=+p[0]*60+ +p[1]; return t>=540&&t<1080;}
-function getOff(tz){const n=new Date(),a=new Date(n.toLocaleString('en-US',{timeZone:tz})),b=new Date(n.toLocaleString('en-US',{timeZone:'Asia/Seoul'})); const d=Math.round((a-b)/3600000); return d>=0?`+${d}h`:`${d}h`;}
-function buildPins(){
-  const g=document.getElementById('pinsLayer'); g.innerHTML='';
-  const all=[]; REGIONS.forEach(r=>r.cities.forEach(c=>all.push({...c,rid:r.id}))); all.push({...SEOUL,rid:'kr'});
-  all.forEach(city=>{
-    const {x,y}=xy(city.lat,city.lon); const col=RC[city.rid]||'#fff';
-    const grp=document.createElementNS('http://www.w3.org/2000/svg','g');
-    grp.setAttribute('transform',`translate(${x},${y})`);
-    grp.innerHTML=`<circle r="3" fill="${col}"/><text x="5" y="-5" fill="${col}" style="font-size:8px; font-weight:600;">${city.name}</text>`;
-    g.appendChild(grp);
-  });
-}
-function buildRegions(){
-  const wrap=document.getElementById('regionsWrap'); wrap.innerHTML='';
-  REGIONS.forEach(r=>{
-    const sec=document.createElement('div'); sec.className=`region region-${r.id}`;
-    sec.innerHTML=`<div class="region-hdr"><div class="r-line"></div><div class="r-tag"><div class="r-dot"></div>${r.label}</div><div class="r-line"></div></div><div class="cards-grid" id="grid-${r.id}"></div>`;
+
+function buildDashboard() {
+  const wrap = document.getElementById('regionsWrap');
+  const pins = document.getElementById('pinsLayer');
+  wrap.innerHTML = ''; pins.innerHTML = '';
+
+  REGIONS.forEach(reg => {
+    const sec = document.createElement('div');
+    sec.innerHTML = `<div class="region-hdr"><div class="r-tag" style="color:${reg.color};border-color:${reg.color}66">${reg.label}</div><div class="r-line"></div></div><div class="cards-grid" id="grid-${reg.id}"></div>`;
     wrap.appendChild(sec);
-    const grid=document.getElementById(`grid-${r.id}`);
-    r.cities.forEach((city,ci)=>{
-      const card=document.createElement('div'); card.className='c-card';
-      card.innerHTML=`<div class="c-top"><div><div class="c-name">${city.name}</div><div class="c-country">${city.country}</div></div><div class="w-ind" id="wi-${r.id}-${ci}"><div class="w-dot"></div><span id="wl-${r.id}-${ci}">OFF</span></div></div><div class="c-time" id="ct-${r.id}-${ci}">--:--</div><div class="c-date" id="cd-${r.id}-${ci}">--</div><div class="c-offset">${getOff(city.tz)} vs Seoul</div>`;
+
+    reg.cities.forEach((c, i) => {
+      const grid = document.getElementById(`grid-${reg.id}`);
+      const card = document.createElement('div');
+      card.className = 'c-card';
+      card.innerHTML = `<div class="c-top"><div><div class="c-name">${c.name}</div><div style="font-size:10px;color:var(--text-muted)">${c.country}</div></div><div class="w-ind" id="wi-${reg.id}-${i}">● OFF</div></div><div class="c-time" id="ct-${reg.id}-${i}">--:--</div><div style="font-size:10px;color:var(--text-dim)" id="cd-${reg.id}-${i}">--</div>`;
       grid.appendChild(card);
+
+      const pos = xy(c.lat, c.lon);
+      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dot.setAttribute("cx", pos.x); dot.setAttribute("cy", pos.y); dot.setAttribute("r", 4);
+      dot.setAttribute("fill", reg.color);
+      pins.appendChild(dot);
+      const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      txt.setAttribute("x", pos.x+6); txt.setAttribute("y", pos.y+2);
+      txt.setAttribute("fill", "#fff"); txt.setAttribute("font-size", "9");
+      txt.textContent = c.name.substring(0,3);
+      pins.appendChild(txt);
     });
   });
 }
-function updateAll(){
-  const now=getNow();
-  document.getElementById('hdrTime').textContent=fmtT(now,'Asia/Seoul');
-  document.getElementById('seoulBigTime').textContent=fmtT(now,'Asia/Seoul');
-  document.getElementById('seoulBigDate').textContent=fmtD(now,'Asia/Seoul');
-  const sw=isWork(now,'Asia/Seoul');
-  document.getElementById('seoulBadge').className=`seoul-badge ${sw?'on':'off'}`;
-  document.getElementById('seoulBadgeLbl').textContent=sw?'OPEN':'OFF';
-  REGIONS.forEach(r=>r.cities.forEach((city,ci)=>{
-    const tEl=document.getElementById(`ct-${r.id}-${ci}`);
-    const dEl=document.getElementById(`cd-${r.id}-${ci}`);
-    const wEl=document.getElementById(`wi-${r.id}-${ci}`);
-    if(tEl) tEl.textContent=fmtT(now,city.tz).substring(0,5);
-    if(dEl) dEl.textContent=fmtD(now,city.tz);
-    if(wEl){const w=isWork(now,city.tz); wEl.className=`w-ind ${w?'on':'off'}`; document.getElementById(`wl-${r.id}-${ci}`).textContent=w?'OPEN':'OFF';}
-  }));
+
+function update() {
+  const now = new Date(Date.now() + calcOffset);
+  document.getElementById('hdrTime').textContent = now.toLocaleTimeString('en-GB', {timeZone:'Asia/Seoul'});
+  document.getElementById('seoulTime').textContent = now.toLocaleTimeString('en-GB', {timeZone:'Asia/Seoul'});
+  document.getElementById('seoulDate').textContent = now.toLocaleDateString('ko-KR', {weekday:'long', month:'long', day:'numeric'});
+
+  REGIONS.forEach(reg => {
+    reg.cities.forEach((c, i) => {
+      const timeStr = now.toLocaleTimeString('en-GB', {timeZone:c.tz, hour:'2-digit', minute:'2-digit'});
+      const hour = parseInt(timeStr.split(':')[0]);
+      document.getElementById(`ct-${reg.id}-${i}`).textContent = timeStr;
+      document.getElementById(`cd-${reg.id}-${i}`).textContent = now.toLocaleDateString('en-GB', {timeZone:c.tz, month:'short', day:'numeric'});
+      
+      const isOpen = hour >= 9 && hour < 18;
+      const ind = document.getElementById(`wi-${reg.id}-${i}`);
+      ind.textContent = isOpen ? '● OPEN' : '● OFF';
+      ind.className = `w-ind ${isOpen ? 'on' : 'off'}`;
+    });
+  });
 }
-function applyCalc(){
-  const v=document.getElementById('calcIn').value; if(!v) return;
-  const [hh,mm]=v.split(':').map(Number); const n=new Date(), sn=new Date(n.toLocaleString('en-US',{timeZone:'Asia/Seoul'}));
-  const tgt=new Date(sn); tgt.setHours(hh,mm,0,0); calcOffset=tgt-sn;
-  document.getElementById('calcBadge').classList.add('on'); updateAll();
+
+function applyCalc() {
+  const val = document.getElementById('calcIn').value;
+  if(!val) return;
+  const [h, m] = val.split(':').map(Number);
+  const seoulNow = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+  const target = new Date(seoulNow);
+  target.setHours(h, m, 0, 0);
+  calcOffset = target - seoulNow;
+  update();
 }
-function resetCalc(){calcOffset=0; document.getElementById('calcIn').value=''; document.getElementById('calcBadge').classList.remove('on'); updateAll();}
-buildRegions(); buildPins(); updateAll(); setInterval(updateAll,1000);
+
+function resetCalc() { calcOffset = 0; update(); }
+
+buildDashboard();
+setInterval(update, 1000);
+update();
 </script>
 </body>
 </html>
