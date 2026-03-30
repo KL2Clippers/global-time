@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLOBAL OPS — World Time Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@200;300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080a0f;--bg2:#0d1018;--bg3:#131620;
+  --card:#10131c;--card-hover:#161a27;
+  --border:rgba(255,255,255,0.06);--border-bright:rgba(255,255,255,0.12);
+  --text:#e8eaf0;--text-muted:#5a6070;--text-dim:#3a4050;
+  --accent-blue:#4a9fff;--accent-cyan:#00d4aa;--accent-amber:#ffb340;--accent-rose:#ff6b6b;
+  --active:#00e887;--active-glow:rgba(0,232,135,0.2);--inactive:#2a3040;
+  --region-am:#4a9fff;--region-eu:#a78bfa;--region-me:#ffb340;--region-as:#00d4aa;--region-kr:#ff6b9d;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 800px 500px at 15% 20%,rgba(74,159,255,.04) 0%,transparent 70%),radial-gradient(ellipse 600px 400px at 85% 70%,rgba(167,139,250,.04) 0%,transparent 70%);pointer-events:none;z-index:0}
+.wrapper{position:relative;z-index:1;max-width:1480px;margin:0 auto;padding:0 24px 80px}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:28px 0 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:16px}
+.logo-group{display:flex;align-items:center;gap:14px}
+.logo-mark{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000;flex-shrink:0}
+.logo-text{font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+.logo-sub{font-size:11px;letter-spacing:.12em;color:var(--text-muted);text-transform:uppercase;margin-top:2px}
+.header-right{display:flex;align-items:center;gap:16px}
+.seoul-hdr{text-align:right}
+.seoul-hdr-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px}
+.seoul-hdr-time{font-family:'DM Mono',monospace;font-size:22px;font-weight:400;color:var(--accent-cyan);letter-spacing:.04em;line-height:1}
+.seoul-hdr-date{font-size:11px;color:var(--text-muted);margin-top:3px;font-family:'DM Mono',monospace;letter-spacing:.06em}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--active);box-shadow:0 0 8px var(--active),0 0 16px var(--active-glow);animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.6}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* TOP LAYOUT */
+.top-section{display:grid;grid-template-columns:1fr 340px;gap:16px;margin-top:24px;align-items:start}
+
+/* PANEL SHARED */
+.panel{background:var(--card);border:1px solid var(--border-bright);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden}
+.panel-accent{position:absolute;top:0;left:0;right:0;height:1px}
+.panel-hdr{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.panel-title{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted)}
+
+/* MAP */
+.map-panel .panel-accent{background:linear-gradient(90deg,transparent,var(--accent-cyan),var(--accent-blue),transparent);opacity:.5}
+#worldSvg{width:100%;height:auto;display:block;border-radius:8px}
+.pin-ring{fill:none;stroke-width:1.5;opacity:.45}
+.pin-dot{transition:r .2s}
+.pin-lbl{font-family:'Outfit',sans-serif;font-size:7px;font-weight:600;pointer-events:none;letter-spacing:.02em}
+.map-pin{cursor:pointer}
+.map-pin:hover .pin-dot{r:5}
+.map-tooltip{position:absolute;background:rgba(10,13,22,.97);border:1px solid var(--border-bright);border-radius:10px;padding:10px 14px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:20;min-width:140px;backdrop-filter:blur(8px)}
+.map-tooltip.show{opacity:1}
+.tt-city{font-size:13px;font-weight:600;color:var(--text)}
+.tt-time{font-family:'DM Mono',monospace;font-size:20px;color:var(--accent-cyan);letter-spacing:.03em;margin-top:3px}
+.tt-date{font-size:10px;color:var(--text-muted);margin-top:2px;font-family:'DM Mono',monospace}
+.tt-badge{display:inline-flex;align-items:center;gap:4px;margin-top:7px;padding:2px 8px;border-radius:100px;border:1px solid;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.tt-badge.open{color:var(--active);border-color:rgba(0,232,135,.3);background:rgba(0,232,135,.08)}
+.tt-badge.off{color:var(--text-dim);border-color:var(--inactive)}
+
+/* RIGHT PANEL */
+.right-col{display:flex;flex-direction:column;gap:14px}
+
+/* SEOUL CARD */
+.seoul-panel{background:var(--card);border:1px solid rgba(255,109,157,.22);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden}
+.seoul-panel .panel-accent{background:linear-gradient(90deg,transparent,var(--region-kr),transparent);opacity:.7}
+.seoul-tag{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--region-kr);opacity:.85;margin-bottom:6px}
+.seoul-flag{font-size:22px;margin-bottom:8px}
+.seoul-city{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.01em}
+.seoul-sub{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-top:2px;margin-bottom:14px}
+.seoul-big-time{font-family:'DM Mono',monospace;font-size:38px;font-weight:400;color:#fff;letter-spacing:-.03em;line-height:1}
+.seoul-big-date{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:.06em;margin-top:6px}
+.seoul-badge{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:3px 10px;border-radius:100px;border:1px solid;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.seoul-badge.on{color:var(--active);border-color:rgba(0,232,135,.3);background:rgba(0,232,135,.08)}
+.seoul-badge.off{color:var(--text-dim);border-color:var(--inactive)}
+.s-dot{width:5px;height:5px;border-radius:50%}
+.seoul-badge.on .s-dot{background:var(--active);box-shadow:0 0 5px var(--active);animation:blink 2s infinite}
+.seoul-badge.off .s-dot{background:var(--text-dim)}
+
+/* SEARCH */
+.search-panel .panel-accent{background:linear-gradient(90deg,transparent,var(--accent-amber),transparent);opacity:.5}
+.search-row{display:flex;gap:8px;margin-bottom:10px}
+.search-input{flex:1;background:var(--bg3);border:1px solid var(--border-bright);border-radius:8px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;padding:9px 13px;outline:none;transition:border-color .2s,box-shadow .2s}
+.search-input:focus{border-color:var(--accent-amber);box-shadow:0 0 0 3px rgba(255,179,64,.12)}
+.search-input::placeholder{color:var(--text-dim)}
+.search-btn{background:linear-gradient(135deg,var(--accent-amber),#ff8c42);border:none;border-radius:8px;color:#000;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;padding:9px 15px;cursor:pointer;transition:opacity .2s,transform .15s;white-space:nowrap}
+.search-btn:hover{opacity:.88;transform:translateY(-1px)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.chip{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:10px;color:var(--text-muted);cursor:pointer;transition:all .15s;letter-spacing:.03em}
+.chip:hover{border-color:var(--accent-amber);color:var(--accent-amber)}
+.s-results{display:flex;flex-direction:column;gap:7px;max-height:260px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.s-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;animation:fadeUp .22s ease both}
+.s-city-name{font-size:13px;font-weight:600;color:var(--text)}
+.s-country{font-size:10px;color:var(--text-muted);letter-spacing:.06em;margin-top:2px}
+.s-time{font-family:'DM Mono',monospace;font-size:17px;color:var(--accent-cyan);text-align:right}
+.s-date{font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;text-align:right;margin-top:2px}
+.s-badge{display:inline-flex;align-items:center;gap:3px;margin-top:4px;padding:2px 7px;border-radius:100px;border:1px solid;font-size:8px;font-weight:700;letter-spacing:.1em}
+.s-badge.open{color:var(--active);border-color:rgba(0,232,135,.3);background:rgba(0,232,135,.08)}
+.s-badge.off{color:var(--text-dim);border-color:var(--inactive)}
+.s-rm{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:15px;padding:2px 4px;transition:color .15s;line-height:1;flex-shrink:0}
+.s-rm:hover{color:var(--accent-rose)}
+.s-empty{font-size:11px;color:var(--text-dim);text-align:center;padding:18px 0;letter-spacing:.04em;line-height:1.6}
+
+/* CALCULATOR */
+.calc-section{margin-top:16px;background:var(--card);border:1px solid var(--border-bright);border-radius:16px;padding:20px 24px;position:relative;overflow:hidden}
+.calc-section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent-blue),var(--accent-cyan),transparent);opacity:.6}
+.calc-hdr{display:flex;align-items:center;gap:10px;margin-bottom:15px}
+.calc-badge{display:none;align-items:center;gap:5px;background:rgba(255,179,64,.12);border:1px solid rgba(255,179,64,.3);border-radius:6px;padding:3px 10px;font-size:10px;color:var(--accent-amber);letter-spacing:.1em;font-weight:600}
+.calc-badge.on{display:flex}
+.calc-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.calc-lbl{font-size:12px;color:var(--text-muted);letter-spacing:.06em;white-space:nowrap}
+.calc-time{background:var(--bg3);border:1px solid var(--border-bright);border-radius:8px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;padding:8px 14px;outline:none;width:148px;transition:border-color .2s,box-shadow .2s}
+.calc-time:focus{border-color:var(--accent-cyan);box-shadow:0 0 0 3px rgba(0,212,170,.12)}
+.calc-time::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:pointer}
+.calc-apply{background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));border:none;border-radius:8px;color:#000;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:9px 18px;cursor:pointer;transition:opacity .2s,transform .15s}
+.calc-apply:hover{opacity:.88;transform:translateY(-1px)}
+.calc-reset{background:transparent;border:1px solid var(--border-bright);border-radius:8px;color:var(--text-muted);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;letter-spacing:.08em;padding:8px 14px;cursor:pointer;transition:all .2s}
+.calc-reset:hover{border-color:var(--text-muted);color:var(--text)}
+
+/* REGIONS */
+.regions{margin-top:24px;display:flex;flex-direction:column;gap:30px}
+.region-hdr{display:flex;align-items:center;gap:12px;margin-bottom:13px}
+.r-line{flex:1;height:1px;background:var(--border)}
+.r-tag{display:flex;align-items:center;gap:7px;padding:4px 13px;border-radius:100px;border:1px solid;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.r-dot{width:6px;height:6px;border-radius:50%}
+.r-count{font-size:10px;color:var(--text-dim);letter-spacing:.06em;white-space:nowrap}
+.region-am .r-tag{color:var(--region-am);border-color:rgba(74,159,255,.3);background:rgba(74,159,255,.06)}
+.region-am .r-dot{background:var(--region-am)}
+.region-eu .r-tag{color:var(--region-eu);border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.06)}
+.region-eu .r-dot{background:var(--region-eu)}
+.region-me .r-tag{color:var(--region-me);border-color:rgba(255,179,64,.3);background:rgba(255,179,64,.06)}
+.region-me .r-dot{background:var(--region-me)}
+.region-as .r-tag{color:var(--region-as);border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.06)}
+.region-as .r-dot{background:var(--region-as)}
+
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:10px}
+.c-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;transition:border-color .25s,background .25s,transform .2s;animation:fadeUp .4s ease both}
+.c-card:hover{background:var(--card-hover);border-color:var(--border-bright);transform:translateY(-2px)}
+.c-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .25s}
+.c-card:hover::before{opacity:1}
+.region-am .c-card::before{background:linear-gradient(90deg,transparent,var(--region-am),transparent)}
+.region-eu .c-card::before{background:linear-gradient(90deg,transparent,var(--region-eu),transparent)}
+.region-me .c-card::before{background:linear-gradient(90deg,transparent,var(--region-me),transparent)}
+.region-as .c-card::before{background:linear-gradient(90deg,transparent,var(--region-as),transparent)}
+.c-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:11px}
+.c-name{font-size:14px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+.c-country{font-size:10px;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.w-ind{display:flex;align-items:center;gap:4px;padding:2px 7px;border-radius:100px;border:1px solid;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transition:all .3s;flex-shrink:0}
+.w-ind.on{color:var(--active);border-color:rgba(0,232,135,.3);background:rgba(0,232,135,.08)}
+.w-ind.off{color:var(--text-dim);border-color:var(--inactive)}
+.w-dot{width:5px;height:5px;border-radius:50%}
+.w-ind.on .w-dot{background:var(--active);box-shadow:0 0 5px var(--active);animation:blink 2s infinite}
+.w-ind.off .w-dot{background:var(--text-dim)}
+.c-time{font-family:'DM Mono',monospace;font-size:26px;font-weight:400;letter-spacing:-.02em;line-height:1;margin-bottom:5px;transition:color .3s}
+.c-card:hover .c-time{color:#fff}
+.c-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:.06em}
+.c-offset{display:inline-flex;margin-top:7px;font-size:9px;color:var(--text-dim);font-family:'DM Mono',monospace;letter-spacing:.04em}
+
+footer{margin-top:50px;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.f-txt{font-size:11px;color:var(--text-dim);letter-spacing:.06em}
+
+@media(max-width:1100px){.top-section{grid-template-columns:1fr}}
+@media(max-width:768px){
+  .wrapper{padding:0 14px 60px}
+  .cards-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+  .c-card{padding:12px 14px}.c-time{font-size:21px}
+}
+@media(max-width:480px){
+  .cards-grid{grid-template-columns:1fr 1fr}
+  .calc-row{flex-direction:column;align-items:flex-start}
+  .calc-time{width:100%}
+  .search-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- HEADER -->
+<header>
+  <div class="logo-group">
+    <div class="logo-mark">G</div>
+    <div>
+      <div class="logo-text">Global OPS</div>
+      <div class="logo-sub">World Time Dashboard</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="seoul-hdr">
+      <div class="seoul-hdr-label">🇰🇷 Seoul — KST (Base)</div>
+      <div class="seoul-hdr-time" id="hdrTime">--:--:--</div>
+      <div class="seoul-hdr-date" id="hdrDate">---</div>
+    </div>
+    <div class="status-dot"></div>
+  </div>
+</header>
+
+<!-- TOP SECTION: MAP + RIGHT COLUMN -->
+<div class="top-section">
+
+  <!-- WORLD MAP -->
+  <div class="panel map-panel">
+    <div class="panel-accent"></div>
+    <div class="panel-hdr">
+      <span style="font-size:15px">🌍</span>
+      <span class="panel-title">Live City Map</span>
+      <span style="font-size:10px;color:var(--text-dim);letter-spacing:.06em;margin-left:4px">— hover pins for details</span>
+    </div>
+    <div style="position:relative">
+      <svg id="worldSvg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+        <rect width="1000" height="500" fill="#090c15" rx="8"/>
+        <!-- Graticule -->
+        <g stroke="rgba(255,255,255,0.035)" stroke-width="0.6" fill="none">
+          <line x1="0" y1="83" x2="1000" y2="83"/>
+          <line x1="0" y1="167" x2="1000" y2="167"/>
+          <line x1="0" y1="333" x2="1000" y2="333"/>
+          <line x1="0" y1="417" x2="1000" y2="417"/>
+          <line x1="167" y1="0" x2="167" y2="500"/>
+          <line x1="333" y1="0" x2="333" y2="500"/>
+          <line x1="667" y1="0" x2="667" y2="500"/>
+          <line x1="833" y1="0" x2="833" y2="500"/>
+        </g>
+        <!-- Equator -->
+        <line x1="0" y1="250" x2="1000" y2="250" stroke="rgba(0,212,170,0.12)" stroke-width="1" stroke-dasharray="4,6"/>
+        <!-- Prime meridian -->
+        <line x1="500" y1="0" x2="500" y2="500" stroke="rgba(255,255,255,0.04)" stroke-width="0.8"/>
+
+        <!-- ── LAND MASSES (simplified) ── -->
+        <!-- Greenland -->
+        <path d="M158,18 L185,14 L206,20 L212,34 L205,50 L188,56 L168,52 L156,40 L155,28Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- North America -->
+        <path d="M52,58 L90,52 L128,48 L162,52 L182,66 L198,86 L204,108 L196,128 L183,144 L168,158 L156,172 L148,192 L142,214 L134,228 L120,238 L106,232 L96,214 L88,196 L78,178 L66,162 L54,146 L46,128 L43,108 L46,86 L52,68Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Baja + Central Am -->
+        <path d="M134,228 L148,230 L156,240 L150,250 L140,246 L130,238Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Cuba -->
+        <ellipse cx="165" cy="236" rx="10" ry="4" fill="#182030" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+        <!-- South America -->
+        <path d="M154,244 L176,238 L200,240 L222,250 L236,268 L246,290 L250,316 L248,342 L240,366 L226,384 L210,398 L196,400 L182,390 L172,372 L164,348 L160,322 L156,294 L152,268 L150,252Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Iceland -->
+        <ellipse cx="418" cy="50" rx="14" ry="8" fill="#182030" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+        <!-- British Isles -->
+        <path d="M430,68 L442,62 L448,70 L444,80 L432,78Z" fill="#182030" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+        <!-- Scandinavia -->
+        <path d="M468,36 L480,32 L494,36 L496,52 L488,62 L475,60 L466,50Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Europe main -->
+        <path d="M436,60 L464,54 L492,56 L512,64 L526,76 L524,90 L514,102 L500,108 L484,116 L468,120 L450,116 L438,104 L432,90 L432,74Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Iberian Peninsula -->
+        <path d="M432,90 L450,88 L464,94 L466,108 L454,116 L438,112 L430,102Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Italy boot -->
+        <path d="M484,108 L492,106 L498,114 L494,128 L484,130 L478,120Z" fill="#182030" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+        <!-- Russia / north Eurasia -->
+        <path d="M488,28 L550,22 L620,18 L690,20 L748,24 L790,32 L818,42 L828,56 L820,70 L800,78 L770,82 L738,82 L706,80 L674,84 L644,90 L612,92 L580,88 L550,84 L522,82 L500,88 L488,96 L480,86 L480,64 L484,44Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Turkey -->
+        <path d="M522,116 L556,112 L582,116 L596,126 L594,138 L578,144 L558,140 L538,134 L524,124Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Middle East -->
+        <path d="M556,132 L590,128 L612,136 L624,150 L616,168 L600,174 L580,166 L562,150Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Arabian Peninsula -->
+        <path d="M560,164 L594,154 L616,162 L630,178 L632,200 L620,218 L600,226 L580,220 L564,204 L556,182Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Africa -->
+        <path d="M452,126 L492,120 L524,124 L544,138 L552,160 L548,188 L538,218 L528,250 L518,280 L512,310 L510,340 L508,364 L500,382 L488,392 L474,388 L460,372 L450,350 L444,322 L442,294 L440,264 L436,236 L432,208 L430,178 L432,154 L440,138Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Madagascar -->
+        <path d="M554,298 L562,292 L570,302 L570,322 L562,334 L554,326 L550,310Z" fill="#182030" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+        <!-- South Asia (India) -->
+        <path d="M616,130 L644,124 L668,132 L678,148 L680,170 L670,192 L654,208 L636,212 L620,200 L610,180 L610,154Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Sri Lanka -->
+        <ellipse cx="660" cy="222" rx="5" ry="8" fill="#182030" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+        <!-- China / East Asia main -->
+        <path d="M706,80 L752,76 L792,82 L820,92 L832,108 L828,126 L812,136 L788,142 L760,142 L736,138 L714,130 L700,116 L698,100Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Korea & Japanese peninsula hint -->
+        <path d="M810,100 L822,96 L828,108 L820,118 L810,120 L806,110Z" fill="#182030" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+        <!-- Japan -->
+        <path d="M836,86 L848,82 L856,90 L852,104 L842,108 L834,100Z" fill="#182030" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+        <!-- Indochina -->
+        <path d="M720,140 L748,134 L764,144 L766,164 L754,178 L736,182 L720,170 L712,154Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Malay peninsula -->
+        <path d="M738,178 L748,174 L754,186 L750,206 L740,210 L734,196Z" fill="#182030" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+        <!-- Borneo -->
+        <ellipse cx="774" cy="210" rx="20" ry="24" fill="#182030" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+        <!-- Australia -->
+        <path d="M756,308 L802,298 L840,302 L868,316 L880,338 L878,362 L862,380 L838,390 L810,392 L782,386 L760,370 L746,348 L744,326Z" fill="#182030" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"/>
+        <!-- Tasmania -->
+        <ellipse cx="826" cy="402" rx="7" ry="6" fill="#182030" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+        <!-- New Zealand -->
+        <ellipse cx="892" cy="378" rx="6" ry="14" fill="#182030" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+
+        <!-- PINS rendered by JS -->
+        <g id="pinsLayer"></g>
+      </svg>
+      <div class="map-tooltip" id="mapTT">
+        <div class="tt-city" id="ttCity">—</div>
+        <div class="tt-time" id="ttTime">--:--:--</div>
+        <div class="tt-date" id="ttDate">---</div>
+        <div class="tt-badge off" id="ttBadge">● OFF</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="right-col">
+
+    <!-- SEOUL CARD -->
+    <div class="seoul-panel">
+      <div class="panel-accent"></div>
+      <div class="seoul-tag">🏠 Home Base</div>
+      <div class="seoul-flag">🇰🇷</div>
+      <div class="seoul-city">Seoul</div>
+      <div class="seoul-sub">South Korea · KST (UTC+9)</div>
+      <div class="seoul-big-time" id="seoulBigTime">--:--:--</div>
+      <div class="seoul-big-date" id="seoulBigDate">---</div>
+      <div class="seoul-badge off" id="seoulBadge">
+        <div class="s-dot"></div>
+        <span id="seoulBadgeLbl">OFF</span>
+      </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="panel search-panel">
+      <div class="panel-accent"></div>
+      <div class="panel-hdr">
+        <span style="font-size:14px">🔍</span>
+        <span class="panel-title">도시 시간 검색</span>
+      </div>
+      <div class="search-row">
+        <input class="search-input" id="searchIn" type="text" placeholder="도시 이름 입력… (Tokyo, Paris…)" autocomplete="off">
+        <button class="search-btn" onclick="doSearch()">검색</button>
+      </div>
+      <div class="chips">
+        <span class="chip" onclick="qs('Tokyo')">Tokyo</span>
+        <span class="chip" onclick="qs('New York')">New York</span>
+        <span class="chip" onclick="qs('London')">London</span>
+        <span class="chip" onclick="qs('Singapore')">Singapore</span>
+        <span class="chip" onclick="qs('Hong Kong')">Hong Kong</span>
+        <span class="chip" onclick="qs('Frankfurt')">Frankfurt</span>
+        <span class="chip" onclick="qs('Nairobi')">Nairobi</span>
+        <span class="chip" onclick="qs('São Paulo')">São Paulo</span>
+      </div>
+      <div class="s-results" id="sResults">
+        <div class="s-empty">검색한 도시의 현재 시간이<br>여기에 표시됩니다</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CALCULATOR -->
+<div class="calc-section">
+  <div class="calc-hdr">
+    <span style="font-size:15px;opacity:.8">⏱</span>
+    <span class="panel-title">시차 계산기 — Seoul KST 기준</span>
+    <span class="calc-badge" id="calcBadge"><span>⚡</span> PREVIEW MODE</span>
+  </div>
+  <div class="calc-row">
+    <span class="calc-lbl">서울 시각 입력</span>
+    <input type="time" class="calc-time" id="calcIn">
+    <button class="calc-apply" onclick="applyCalc()">전체 적용</button>
+    <button class="calc-reset" onclick="resetCalc()">실시간으로 돌아가기</button>
+  </div>
+</div>
+
+<!-- REGIONS -->
+<div class="regions" id="regionsWrap"></div>
+
+<footer>
+  <span class="f-txt">© 2025 Global OPS Dashboard — Live · 1s refresh</span>
+  <span class="f-txt">15 cities · 4 regions · Seoul base</span>
+</footer>
+</div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const REGIONS=[
+  {id:'am',label:'Americas',cities:[
+    {name:'Los Angeles',       country:'USA',            tz:'America/Los_Angeles',  lat:34.05, lon:-118.24},
+    {name:'San Francisco',     country:'USA',            tz:'America/Los_Angeles',  lat:37.77, lon:-122.42},
+    {name:'Dominican Republic',country:'Dominican Rep.', tz:'America/Santo_Domingo',lat:18.48, lon:-69.93},
+  ]},
+  {id:'eu',label:'Europe',cities:[
+    {name:'Barcelona', country:'Spain',       tz:'Europe/Madrid',    lat:41.38,lon:2.17},
+    {name:'Geneva',    country:'Switzerland', tz:'Europe/Zurich',    lat:46.20,lon:6.15},
+    {name:'Moscow',    country:'Russia',      tz:'Europe/Moscow',    lat:55.75,lon:37.62},
+    {name:'Stockholm', country:'Sweden',      tz:'Europe/Stockholm', lat:59.33,lon:18.07},
+  ]},
+  {id:'me',label:'Middle East & Africa',cities:[
+    {name:'Angola',   country:'Angola',       tz:'Africa/Luanda',   lat:-8.83, lon:13.23},
+    {name:'Dubai',    country:'UAE',          tz:'Asia/Dubai',      lat:25.20, lon:55.27},
+    {name:'Istanbul', country:'Türkiye',      tz:'Europe/Istanbul', lat:41.01, lon:28.96},
+    {name:'Riyadh',   country:'Saudi Arabia', tz:'Asia/Riyadh',     lat:24.69, lon:46.72},
+  ]},
+  {id:'as',label:'Asia & Oceania',cities:[
+    {name:'Melbourne',country:'Australia',tz:'Australia/Melbourne',lat:-37.81,lon:144.96},
+    {name:'Mumbai',   country:'India',    tz:'Asia/Kolkata',       lat:19.08, lon:72.88},
+    {name:'Shanghai', country:'China',    tz:'Asia/Shanghai',      lat:31.23, lon:121.47},
+    {name:'Sydney',   country:'Australia',tz:'Australia/Sydney',   lat:-33.87,lon:151.21},
+  ]},
+];
+const SEOUL={name:'Seoul',country:'South Korea',tz:'Asia/Seoul',lat:37.57,lon:126.98};
+const RC={am:'#4a9fff',eu:'#a78bfa',me:'#ffb340',as:'#00d4aa',kr:'#ff6b9d'};
+
+const CITY_DB={
+  'tokyo':{name:'Tokyo',country:'Japan',tz:'Asia/Tokyo',lat:35.68,lon:139.69},
+  'new york':{name:'New York',country:'USA',tz:'America/New_York',lat:40.71,lon:-74.01},
+  'london':{name:'London',country:'UK',tz:'Europe/London',lat:51.51,lon:-0.13},
+  'singapore':{name:'Singapore',country:'Singapore',tz:'Asia/Singapore',lat:1.35,lon:103.82},
+  'hong kong':{name:'Hong Kong',country:'China',tz:'Asia/Hong_Kong',lat:22.32,lon:114.17},
+  'frankfurt':{name:'Frankfurt',country:'Germany',tz:'Europe/Berlin',lat:50.11,lon:8.68},
+  'nairobi':{name:'Nairobi',country:'Kenya',tz:'Africa/Nairobi',lat:-1.29,lon:36.82},
+  'são paulo':{name:'São Paulo',country:'Brazil',tz:'America/Sao_Paulo',lat:-23.55,lon:-46.63},
+  'sao paulo':{name:'São Paulo',country:'Brazil',tz:'America/Sao_Paulo',lat:-23.55,lon:-46.63},
+  'paris':{name:'Paris',country:'France',tz:'Europe/Paris',lat:48.85,lon:2.35},
+  'berlin':{name:'Berlin',country:'Germany',tz:'Europe/Berlin',lat:52.52,lon:13.40},
+  'amsterdam':{name:'Amsterdam',country:'Netherlands',tz:'Europe/Amsterdam',lat:52.37,lon:4.90},
+  'rome':{name:'Rome',country:'Italy',tz:'Europe/Rome',lat:41.90,lon:12.50},
+  'madrid':{name:'Madrid',country:'Spain',tz:'Europe/Madrid',lat:40.42,lon:-3.70},
+  'vienna':{name:'Vienna',country:'Austria',tz:'Europe/Vienna',lat:48.21,lon:16.37},
+  'zurich':{name:'Zurich',country:'Switzerland',tz:'Europe/Zurich',lat:47.38,lon:8.54},
+  'warsaw':{name:'Warsaw',country:'Poland',tz:'Europe/Warsaw',lat:52.23,lon:21.01},
+  'prague':{name:'Prague',country:'Czech Republic',tz:'Europe/Prague',lat:50.08,lon:14.44},
+  'cairo':{name:'Cairo',country:'Egypt',tz:'Africa/Cairo',lat:30.04,lon:31.24},
+  'johannesburg':{name:'Johannesburg',country:'South Africa',tz:'Africa/Johannesburg',lat:-26.20,lon:28.04},
+  'lagos':{name:'Lagos',country:'Nigeria',tz:'Africa/Lagos',lat:6.52,lon:3.38},
+  'casablanca':{name:'Casablanca',country:'Morocco',tz:'Africa/Casablanca',lat:33.59,lon:-7.62},
+  'tehran':{name:'Tehran',country:'Iran',tz:'Asia/Tehran',lat:35.69,lon:51.39},
+  'delhi':{name:'Delhi',country:'India',tz:'Asia/Kolkata',lat:28.61,lon:77.21},
+  'bangalore':{name:'Bangalore',country:'India',tz:'Asia/Kolkata',lat:12.97,lon:77.59},
+  'dhaka':{name:'Dhaka',country:'Bangladesh',tz:'Asia/Dhaka',lat:23.72,lon:90.41},
+  'bangkok':{name:'Bangkok',country:'Thailand',tz:'Asia/Bangkok',lat:13.75,lon:100.52},
+  'kuala lumpur':{name:'Kuala Lumpur',country:'Malaysia',tz:'Asia/Kuala_Lumpur',lat:3.14,lon:101.69},
+  'jakarta':{name:'Jakarta',country:'Indonesia',tz:'Asia/Jakarta',lat:-6.21,lon:106.85},
+  'manila':{name:'Manila',country:'Philippines',tz:'Asia/Manila',lat:14.60,lon:120.98},
+  'taipei':{name:'Taipei',country:'Taiwan',tz:'Asia/Taipei',lat:25.04,lon:121.56},
+  'beijing':{name:'Beijing',country:'China',tz:'Asia/Shanghai',lat:39.91,lon:116.39},
+  'osaka':{name:'Osaka',country:'Japan',tz:'Asia/Tokyo',lat:34.69,lon:135.50},
+  'auckland':{name:'Auckland',country:'New Zealand',tz:'Pacific/Auckland',lat:-36.87,lon:174.77},
+  'toronto':{name:'Toronto',country:'Canada',tz:'America/Toronto',lat:43.65,lon:-79.38},
+  'chicago':{name:'Chicago',country:'USA',tz:'America/Chicago',lat:41.88,lon:-87.63},
+  'houston':{name:'Houston',country:'USA',tz:'America/Chicago',lat:29.76,lon:-95.37},
+  'miami':{name:'Miami',country:'USA',tz:'America/New_York',lat:25.77,lon:-80.19},
+  'seattle':{name:'Seattle',country:'USA',tz:'America/Los_Angeles',lat:47.61,lon:-122.33},
+  'mexico city':{name:'Mexico City',country:'Mexico',tz:'America/Mexico_City',lat:19.43,lon:-99.13},
+  'buenos aires':{name:'Buenos Aires',country:'Argentina',tz:'America/Argentina/Buenos_Aires',lat:-34.61,lon:-58.38},
+  'bogota':{name:'Bogotá',country:'Colombia',tz:'America/Bogota',lat:4.71,lon:-74.07},
+  'lima':{name:'Lima',country:'Peru',tz:'America/Lima',lat:-12.05,lon:-77.04},
+  'santiago':{name:'Santiago',country:'Chile',tz:'America/Santiago',lat:-33.46,lon:-70.65},
+  'moscow':{name:'Moscow',country:'Russia',tz:'Europe/Moscow',lat:55.75,lon:37.62},
+  'istanbul':{name:'Istanbul',country:'Türkiye',tz:'Europe/Istanbul',lat:41.01,lon:28.96},
+  'dubai':{name:'Dubai',country:'UAE',tz:'Asia/Dubai',lat:25.20,lon:55.27},
+  'riyadh':{name:'Riyadh',country:'Saudi Arabia',tz:'Asia/Riyadh',lat:24.69,lon:46.72},
+  'mumbai':{name:'Mumbai',country:'India',tz:'Asia/Kolkata',lat:19.08,lon:72.88},
+  'shanghai':{name:'Shanghai',country:'China',tz:'Asia/Shanghai',lat:31.23,lon:121.47},
+  'sydney':{name:'Sydney',country:'Australia',tz:'Australia/Sydney',lat:-33.87,lon:151.21},
+  'melbourne':{name:'Melbourne',country:'Australia',tz:'Australia/Melbourne',lat:-37.81,lon:144.96},
+  'seoul':{name:'Seoul',country:'South Korea',tz:'Asia/Seoul',lat:37.57,lon:126.98},
+  'karachi':{name:'Karachi',country:'Pakistan',tz:'Asia/Karachi',lat:24.86,lon:67.01},
+  'colombo':{name:'Colombo',country:'Sri Lanka',tz:'Asia/Colombo',lat:6.93,lon:79.85},
+};
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let calcOffset=0;
+let searchCities=[];
+let activeTTCity=null;
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+const getNow=()=>new Date(Date.now()+calcOffset);
+const xy=(lat,lon)=>({x:(lon+180)/360*1000, y:(90-lat)/180*500});
+const fmtT=(d,tz)=>d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+const fmtTS=(d,tz)=>d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false});
+const fmtD=(d,tz)=>d.toLocaleDateString('en-GB',{timeZone:tz,weekday:'short',month:'short',day:'numeric'});
+function isWork(d,tz){
+  const p=d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).split(':');
+  const t=+p[0]*60+ +p[1]; return t>=540&&t<1080;
+}
+function getOff(tz){
+  const n=new Date(),a=new Date(n.toLocaleString('en-US',{timeZone:tz})),b=new Date(n.toLocaleString('en-US',{timeZone:'Asia/Seoul'}));
+  const d=Math.round((a-b)/3600000); return d>=0?`+${d}h`:`${d}h`;
+}
+
+// ─── BUILD MAP PINS ───────────────────────────────────────────────────────────
+function buildPins(){
+  const g=document.getElementById('pinsLayer');
+  g.innerHTML='';
+  const all=[];
+  REGIONS.forEach(r=>r.cities.forEach(c=>all.push({...c,rid:r.id})));
+  all.push({...SEOUL,rid:'kr'});
+
+  all.forEach(city=>{
+    const {x,y}=xy(city.lat,city.lon);
+    const col=RC[city.rid]||'#fff';
+    const short=city.name.split(' ')[0].replace(/[()]/g,'');
+    const grp=document.createElementNS('http://www.w3.org/2000/svg','g');
+    grp.setAttribute('class','map-pin');
+    grp.setAttribute('transform',`translate(${x.toFixed(1)},${y.toFixed(1)})`);
+    grp.innerHTML=`
+      <circle class="pin-ring" r="6.5" stroke="${col}"/>
+      <circle class="pin-dot" r="3.2" fill="${col}"/>
+      <text class="pin-lbl" x="5" y="-5" fill="${col}">${short}</text>`;
+    grp.addEventListener('mouseenter',e=>showTT(e,city));
+    grp.addEventListener('mouseleave',hideTT);
+    g.appendChild(grp);
+  });
+}
+
+let ttCity=null;
+function showTT(e,city){
+  ttCity=city;
+  const tt=document.getElementById('mapTT');
+  const now=getNow();
+  document.getElementById('ttCity').textContent=`${city.name}, ${city.country}`;
+  document.getElementById('ttTime').textContent=fmtT(now,city.tz);
+  document.getElementById('ttDate').textContent=fmtD(now,city.tz);
+  const w=isWork(now,city.tz);
+  const b=document.getElementById('ttBadge');
+  b.textContent=w?'● OPEN':'● OFF'; b.className=`tt-badge ${w?'open':'off'}`;
+
+  const svg=document.getElementById('worldSvg');
+  const sr=svg.getBoundingClientRect();
+  const pr=svg.parentElement.getBoundingClientRect();
+  const {x,y}=xy(city.lat,city.lon);
+  const sx=sr.width/1000, sy=sr.height/500;
+  let tx=sr.left-pr.left+x*sx+8, ty=sr.top-pr.top+y*sy-28;
+  if(tx+150>pr.width) tx-=165;
+  if(ty<4) ty=4;
+  tt.style.left=tx+'px'; tt.style.top=ty+'px';
+  tt.classList.add('show');
+}
+function hideTT(){ttCity=null;document.getElementById('mapTT').classList.remove('show');}
+function updateTT(){
+  if(!ttCity) return;
+  const now=getNow();
+  document.getElementById('ttTime').textContent=fmtT(now,ttCity.tz);
+  document.getElementById('ttDate').textContent=fmtD(now,ttCity.tz);
+  const w=isWork(now,ttCity.tz);
+  const b=document.getElementById('ttBadge');
+  b.textContent=w?'● OPEN':'● OFF'; b.className=`tt-badge ${w?'open':'off'}`;
+}
+
+// ─── BUILD REGION CARDS ───────────────────────────────────────────────────────
+function buildRegions(){
+  const wrap=document.getElementById('regionsWrap');
+  wrap.innerHTML='';
+  REGIONS.forEach((r,ri)=>{
+    const sec=document.createElement('div');
+    sec.className=`region region-${r.id}`;
+    sec.innerHTML=`<div class="region-hdr"><div class="r-line"></div><div class="r-tag"><div class="r-dot"></div>${r.label}</div><span class="r-count">${r.cities.length} cities</span><div class="r-line"></div></div>`;
+    const grid=document.createElement('div');
+    grid.className='cards-grid';
+    r.cities.forEach((city,ci)=>{
+      const card=document.createElement('div');
+      card.className='c-card';
+      card.id=`cc-${r.id}-${ci}`;
+      card.style.animationDelay=`${(ri*4+ci)*0.04}s`;
+      card.innerHTML=`
+        <div class="c-top">
+          <div><div class="c-name">${city.name}</div><div class="c-country">${city.country}</div></div>
+          <div class="w-ind off" id="wi-${r.id}-${ci}"><div class="w-dot"></div><span id="wl-${r.id}-${ci}">OFF</span></div>
+        </div>
+        <div class="c-time" id="ct-${r.id}-${ci}">--:--:--</div>
+        <div class="c-date" id="cd-${r.id}-${ci}">---</div>
+        <div class="c-offset">${getOff(city.tz)} vs Seoul</div>`;
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid);
+    wrap.appendChild(sec);
+  });
+}
+
+// ─── UPDATE ALL ───────────────────────────────────────────────────────────────
+function updateAll(){
+  const now=getNow();
+  // Header + Seoul card
+  document.getElementById('hdrTime').textContent=fmtT(now,'Asia/Seoul');
+  document.getElementById('hdrDate').textContent=fmtD(now,'Asia/Seoul');
+  document.getElementById('seoulBigTime').textContent=fmtT(now,'Asia/Seoul');
+  document.getElementById('seoulBigDate').textContent=fmtD(now,'Asia/Seoul');
+  const sw=isWork(now,'Asia/Seoul');
+  const sb=document.getElementById('seoulBadge');
+  sb.className=`seoul-badge ${sw?'on':'off'}`;
+  document.getElementById('seoulBadgeLbl').textContent=sw?'OPEN':'OFF';
+
+  // Region cards
+  REGIONS.forEach(r=>r.cities.forEach((city,ci)=>{
+    const tEl=document.getElementById(`ct-${r.id}-${ci}`);
+    const dEl=document.getElementById(`cd-${r.id}-${ci}`);
+    const wEl=document.getElementById(`wi-${r.id}-${ci}`);
+    const wlEl=document.getElementById(`wl-${r.id}-${ci}`);
+    if(tEl) tEl.textContent=fmtT(now,city.tz);
+    if(dEl) dEl.textContent=fmtD(now,city.tz);
+    if(wEl){const w=isWork(now,city.tz); wEl.className=`w-ind ${w?'on':'off'}`; wlEl.textContent=w?'OPEN':'OFF';}
+  }));
+
+  // Search results
+  updateSearchDisplay();
+  updateTT();
+}
+
+// ─── SEARCH ──────────────────────────────────────────────────────────────────
+function qs(name){document.getElementById('searchIn').value=name; doSearch();}
+function doSearch(){
+  const raw=document.getElementById('searchIn').value.trim();
+  if(!raw) return;
+  const q=raw.toLowerCase();
+  let found=CITY_DB[q];
+  if(!found){
+    const k=Object.keys(CITY_DB).find(k=>k.includes(q)||q.includes(k));
+    if(k) found=CITY_DB[k];
+  }
+  const res=document.getElementById('sResults');
+  if(!found){
+    res.innerHTML=`<div class="s-empty">😕 "<strong style="color:var(--text)">${raw}</strong>" 를 찾을 수 없습니다<br><span style="font-size:10px;color:var(--text-dim)">Try: Tokyo, London, Paris…</span></div>`;
+    return;
+  }
+  if(!searchCities.find(c=>c.tz===found.tz&&c.name===found.name)){
+    searchCities.unshift(found);
+    if(searchCities.length>8) searchCities.pop();
+  }
+  document.getElementById('searchIn').value='';
+  renderSearch();
+}
+
+function renderSearch(){
+  const res=document.getElementById('sResults');
+  if(!searchCities.length){res.innerHTML='<div class="s-empty">검색한 도시의 현재 시간이<br>여기에 표시됩니다</div>';return;}
+  res.innerHTML='';
+  searchCities.forEach((city,i)=>{
+    const card=document.createElement('div');
+    card.className='s-card';
+    card.style.animationDelay=`${i*0.04}s`;
+    card.innerHTML=`
+      <div><div class="s-city-name">${city.name}</div><div class="s-country">${city.country}</div></div>
+      <div style="text-align:right;flex:1">
+        <div class="s-time" id="st-${i}">--:--</div>
+        <div class="s-date" id="sd-${i}">---</div>
+        <div class="s-badge off" id="sb-${i}">● OFF</div>
+      </div>
+      <button class="s-rm" onclick="rmSearch(${i})">×</button>`;
+    res.appendChild(card);
+  });
+  updateSearchDisplay();
+}
+
+function updateSearchDisplay(){
+  const now=getNow();
+  searchCities.forEach((c,i)=>{
+    const tEl=document.getElementById(`st-${i}`);
+    const dEl=document.getElementById(`sd-${i}`);
+    const bEl=document.getElementById(`sb-${i}`);
+    if(!tEl) return;
+    tEl.textContent=fmtTS(now,c.tz);
+    dEl.textContent=fmtD(now,c.tz);
+    const w=isWork(now,c.tz);
+    bEl.textContent=w?'● OPEN':'● OFF'; bEl.className=`s-badge ${w?'open':'off'}`;
+  });
+}
+function rmSearch(i){searchCities.splice(i,1); renderSearch();}
+
+// ─── CALCULATOR ──────────────────────────────────────────────────────────────
+function applyCalc(){
+  const v=document.getElementById('calcIn').value; if(!v) return;
+  const [hh,mm]=v.split(':').map(Number);
+  const n=new Date(), sn=new Date(n.toLocaleString('en-US',{timeZone:'Asia/Seoul'}));
+  const tgt=new Date(sn); tgt.setHours(hh,mm,0,0);
+  calcOffset=tgt-sn;
+  document.getElementById('calcBadge').classList.add('on');
+  updateAll();
+}
+function resetCalc(){
+  calcOffset=0;
+  document.getElementById('calcIn').value='';
+  document.getElementById('calcBadge').classList.remove('on');
+  updateAll();
+}
+document.getElementById('calcIn').addEventListener('keydown',e=>{if(e.key==='Enter')applyCalc();});
+document.getElementById('searchIn').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+buildRegions();
+buildPins();
+updateAll();
+setInterval(updateAll,1000);
+</script>
+</body>
+</html>
