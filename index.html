@@ -4,195 +4,215 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GLOBAL OPS — World Time Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-    :root {
-        --bg: #080a0f; --card: #10131c; --card-hover: #161a27;
-        --border: rgba(255,255,255,0.06); --border-bright: rgba(255,255,255,0.12);
-        --text: #e8eaf0; --text-muted: #5a6070; --text-dim: #3a4050;
-        --accent-blue: #4a9fff; --accent-cyan: #00d4aa; --accent-amber: #ffb340;
-        --active: #00e887; --inactive: #2a3040;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; min-height: 100vh; padding: 20px; overflow-x: hidden; }
-    .wrapper { max-width: 1480px; margin: 0 auto; }
-    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
-    .logo { font-weight: 700; letter-spacing: 2px; color: var(--accent-blue); font-size: 14px; text-transform: uppercase; }
-    .hdr-clock { font-family: 'DM Mono', monospace; color: var(--accent-cyan); font-size: 22px; }
+:root{
+  --bg:#080a0f;--card:#10131c;--card-hover:#161a27;
+  --border:rgba(255,255,255,0.06);--border-bright:rgba(255,255,255,0.12);
+  --text:#e8eaf0;--text-muted:#5a6070;--text-dim:#3a4050;
+  --accent-blue:#4a9fff;--accent-cyan:#00d4aa;--accent-amber:#ffb340;
+  --active:#00e887;--inactive:#2a3040;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
+.wrapper{max-width:1480px;margin:0 auto;padding:0 24px 80px}
 
-    .main-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; margin-top: 24px; }
-    .map-panel { background: var(--card); border-radius: 16px; border: 1px solid var(--border-bright); padding: 0; position: relative; overflow: hidden; }
-    .map-container { position: relative; width: 100%; aspect-ratio: 1.8 / 1; background: #0d111a; }
-    /* 위키피디아의 표준 메르카토르 지도를 배경으로 고정 */
-    .map-img { position: absolute; width: 100%; height: 100%; object-fit: fill; opacity: 0.35; filter: brightness(1.2) contrast(1.1); }
-    #pins-layer { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; }
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:28px 0 20px;border-bottom:1px solid var(--border)}
+.logo-group{display:flex;align-items:center;gap:14px}
+.logo-mark{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000}
+.logo-text{font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+.seoul-hdr{text-align:right}
+.seoul-hdr-time{font-family:'DM Mono',monospace;font-size:22px;color:var(--accent-cyan)}
 
-    .seoul-card { background: var(--card); border-radius: 16px; border: 1px solid var(--accent-cyan); padding: 30px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-    .seoul-time { font-family: 'DM Mono', monospace; font-size: 42px; color: #fff; margin: 15px 0; }
+/* MAP SECTION */
+.top-section{display:grid;grid-template-columns:1fr 340px;gap:16px;margin-top:24px}
+.panel{background:var(--card);border:1px solid var(--border-bright);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden}
+.map-container{position:relative;width:100%;aspect-ratio:2/1;background:#0d111a;border-radius:8px;overflow:hidden}
+/* 실제 세계지도 이미지를 배경으로 사용 */
+.world-bg{position:absolute;width:100%;height:100%;opacity:0.3;object-fit:contain;filter:invert(1) brightness(0.5);}
+#pinsLayer{position:absolute;inset:0;z-index:2}
 
-    .calc-bar { background: var(--card); margin-top: 20px; padding: 18px 25px; border-radius: 12px; display: flex; align-items: center; gap: 20px; border: 1px solid var(--border); }
-    .calc-bar input { background: #1a1f2e; border: 1px solid var(--border-bright); color: #fff; padding: 10px; border-radius: 6px; font-family: 'DM Mono'; outline: none; }
-    .calc-bar button { background: var(--accent-blue); border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 700; color: #000; }
+/* CARDS */
+.regions{margin-top:32px;display:flex;flex-direction:column;gap:32px}
+.region-hdr{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.r-line{flex:1;height:1px;background:var(--border)}
+.r-tag{padding:4px 12px;border-radius:100px;border:1px solid;font-size:10px;font-weight:700;text-transform:uppercase}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.c-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:all .2s}
+.c-card:hover{background:var(--card-hover);transform:translateY(-2px)}
+.c-top{display:flex;justify-content:space-between;margin-bottom:12px}
+.c-name{font-size:15px;font-weight:600}
+.c-time{font-family:'DM Mono',monospace;font-size:28px;line-height:1;margin-bottom:6px}
+.w-ind{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:100px;border:1px solid}
+.w-ind.on{color:var(--active);border-color:rgba(0,232,135,.3);background:rgba(0,232,135,.08)}
+.w-ind.off{color:var(--text-dim);border-color:var(--inactive)}
 
-    .region-group { margin-top: 40px; }
-    .region-title { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; font-size: 12px; letter-spacing: 3px; color: var(--text-muted); font-weight: 600; }
-    .region-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
-    .card { background: var(--card); border: 1px solid var(--border); padding: 24px; border-radius: 16px; transition: 0.3s; position: relative; }
-    .card:hover { background: var(--card-hover); transform: translateY(-5px); border-color: var(--border-bright); }
-    .status { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; border: 1px solid; }
-    .status.on { color: var(--active); border-color: rgba(0,232,135,0.3); background: rgba(0,232,135,0.08); }
-    .status.off { color: var(--text-dim); border-color: var(--inactive); }
-    .time { font-family: 'DM Mono', monospace; font-size: 32px; margin-bottom: 8px; }
-    .offset { font-size: 9px; color: var(--text-dim); margin-top: 10px; font-family: 'DM Mono'; border-top: 1px solid var(--border); padding-top: 10px; }
-
-    @media (max-width: 1000px) { .main-layout { grid-template-columns: 1fr; } }
+/* CALCULATOR */
+.calc-section{margin-top:24px;background:var(--card);border:1px solid var(--accent-blue);border-radius:16px;padding:20px 24px}
+.calc-time{background:#1a1f2e;border:1px solid var(--border-bright);color:#fff;padding:8px;border-radius:6px;font-family:'DM Mono'}
+.calc-btn{background:var(--accent-blue);border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer;color:#000}
 </style>
 </head>
 <body>
-    <div class="wrapper">
-        <header>
-            <div class="logo">GLOBAL OPS DASHBOARD — v1.5</div>
-            <div class="hdr-clock" id="hdr-clock">00:00:00</div>
-        </header>
-
-        <div class="main-layout">
-            <div class="map-panel">
-                <div class="map-container">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/World-map-2004-cia-factbook-large-1.7mb.png" class="map-img">
-                    <svg id="pins-layer" viewBox="0 0 1000 500" preserveAspectRatio="none"></svg>
-                </div>
-            </div>
-            <div class="seoul-card">
-                <div style="font-size:11px; color:var(--accent-cyan); letter-spacing: 2px;">SEOUL BASE</div>
-                <div class="seoul-time" id="seoul-time">00:00:00</div>
-                <div id="seoul-date" style="font-size:14px; color:var(--text-muted);">---</div>
-            </div>
-        </div>
-
-        <div class="calc-bar">
-            <span style="font-size:13px; font-weight:600;">⏱ 시차 계산기 (서울 시간 입력):</span>
-            <input type="time" id="calc-input">
-            <button onclick="applyCalc()">전체 적용</button>
-            <button onclick="resetCalc()" style="background:none; color:var(--text-muted); border:1px solid var(--border); margin-left: 5px;">실시간 초기화</button>
-        </div>
-
-        <div id="regions-wrap"></div>
+<div class="wrapper">
+  <header>
+    <div class="logo-group">
+      <div class="logo-mark">G</div>
+      <div><div class="logo-text">Global OPS Dashboard</div></div>
     </div>
+    <div class="seoul-hdr">
+      <div style="font-size:10px;color:var(--text-muted)">SEOUL BASE (KST)</div>
+      <div class="seoul-hdr-time" id="hdrTime">00:00:00</div>
+    </div>
+  </header>
+
+  <div class="top-section">
+    <div class="panel">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase">🌍 Global Market Presence</div>
+      <div class="map-container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" class="world-bg" alt="World Map">
+        <svg id="pinsLayer" viewBox="0 0 1000 500"></svg>
+      </div>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;justify-content:center;text-align:center;">
+        <div style="font-size:40px;margin-bottom:10px;">🇰🇷</div>
+        <div style="font-size:18px;font-weight:700;">Seoul, Korea</div>
+        <div id="seoulTime" style="font-size:32px;font-family:'DM Mono';color:var(--accent-cyan);margin:10px 0;">--:--:--</div>
+        <div id="seoulDate" style="font-size:12px;color:var(--text-muted);">---</div>
+    </div>
+  </div>
+
+  <div class="calc-section">
+    <span style="font-size:13px;margin-right:15px;">⏱ 시차 계산기 (서울 기준):</span>
+    <input type="time" id="calcIn" class="calc-time">
+    <button class="calc-btn" onclick="applyCalc()">시간 적용</button>
+    <button onclick="resetCalc()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;margin-left:10px;">리셋</button>
+  </div>
+
+  <div class="regions" id="regionsWrap"></div>
+</div>
 
 <script>
-    const REGIONS = [
-        { id:'am', label:'AMERICAS', color:'#4a9fff', cities:[
-            { name:'Dominican Rep.', tz:'America/Santo_Domingo', lat:18.7, lon:-70.2 },
-            { name:'Los Angeles', tz:'America/Los_Angeles', lat:34.1, lon:-118.2 },
-            { name:'San Francisco', tz:'America/Los_Angeles', lat:37.8, lon:-122.4 }
-        ]},
-        { id:'eu', label:'EUROPE', color:'#a78bfa', cities:[
-            { name:'Amsterdam', tz:'Europe/Amsterdam', lat:52.4, lon:4.9 },
-            { name:'Barcelona', tz:'Europe/Madrid', lat:41.4, lon:2.2 },
-            { name:'Geneva', tz:'Europe/Zurich', lat:46.2, lon:6.1 },
-            { name:'London', tz:'Europe/London', lat:51.5, lon:-0.1 },
-            { name:'Moscow', tz:'Europe/Moscow', lat:55.8, lon:37.6 },
-            { name:'Stockholm', tz:'Europe/Stockholm', lat:59.3, lon:18.1 }
-        ]},
-        { id:'me', label:'MIDDLE EAST & AFRICA', color:'#ffb340', cities:[
-            { name:'Angola', tz:'Africa/Luanda', lat:-8.8, lon:13.2 },
-            { name:'Dubai', tz:'Asia/Dubai', lat:25.3, lon:55.3 },
-            { name:'Istanbul', tz:'Europe/Istanbul', lat:41.0, lon:29.0 },
-            { name:'Riyadh', tz:'Asia/Riyadh', lat:24.7, lon:46.7 }
-        ]},
-        { id:'as', label:'ASIA & OCEANIA', color:'#00d4aa', cities:[
-            { name:'Melbourne', tz:'Australia/Melbourne', lat:-37.8, lon:144.9 },
-            { name:'Mumbai', tz:'Asia/Kolkata', lat:19.1, lon:72.9 },
-            { name:'Shanghai', tz:'Asia/Shanghai', lat:31.2, lon:121.5 },
-            { name:'Sydney', tz:'Australia/Sydney', lat:-33.9, lon:151.2 }
-        ]}
-    ];
+const REGIONS=[
+  {id:'am',label:'Americas',color:'#4a9fff',cities:[
+    {name:'Dominican Republic',tz:'America/Santo_Domingo',lat:18.4,lon:-69.9, country:'DOM'},
+    {name:'Los Angeles',tz:'America/Los_Angeles',lat:34.0,lon:-118.2, country:'USA'},
+    {name:'San Francisco',tz:'America/Los_Angeles',lat:37.7,lon:-122.4, country:'USA'}
+  ]},
+  {id:'eu',label:'Europe',color:'#a78bfa',cities:[
+    {name:'Amsterdam',tz:'Europe/Amsterdam',lat:52.3,lon:4.9, country:'NED'},
+    {name:'Barcelona',tz:'Europe/Madrid',lat:41.3,lon:2.1, country:'SPA'},
+    {name:'Geneva',tz:'Europe/Zurich',lat:46.2,lon:6.1, country:'SUI'},
+    {name:'London',tz:'Europe/London',lat:51.5,lon:-0.1, country:'UK'},
+    {name:'Moscow',tz:'Europe/Moscow',lat:55.7,lon:37.6, country:'RUS'},
+    {name:'Stockholm',tz:'Europe/Stockholm',lat:59.3,lon:18.0, country:'SWE'}
+  ]},
+  {id:'me',label:'Middle East & Africa',color:'#ffb340',cities:[
+    {name:'Angola',tz:'Africa/Luanda',lat:-8.8,lon:13.2, country:'ANG'},
+    {name:'Dubai',tz:'Asia/Dubai',lat:25.2,lon:55.2, country:'UAE'},
+    {name:'Istanbul',tz:'Europe/Istanbul',lat:41.0,lon:28.9, country:'TUR'},
+    {name:'Riyadh',tz:'Asia/Riyadh',lat:24.6,lon:46.7, country:'KSA'}
+  ]},
+  {id:'as',label:'Asia & Oceania',color:'#00d4aa',cities:[
+    {name:'Melbourne',tz:'Australia/Melbourne',lat:-37.8,lon:144.9, country:'AUS'},
+    {name:'Mumbai',tz:'Asia/Kolkata',lat:19.0,lon:72.8, country:'IND'},
+    {name:'Shanghai',tz:'Asia/Shanghai',lat:31.2,lon:121.4, country:'CHN'},
+    {name:'Sydney',tz:'Australia/Sydney',lat:-33.8,lon:151.2, country:'AUS'},
+    {name:'Seoul',tz:'Asia/Seoul',lat:37.5,lon:127.0, country:'KOR'}
+  ]}
+];
 
-    let calcOffset = 0;
-    const getXY = (lat, lon) => {
-        const x = (lon + 180) * (1000 / 360);
-        const latRad = lat * Math.PI / 180;
-        const mercN = Math.log(Math.tan((Math.PI / 4) + (latRad / 2)));
-        let y = (500 / 2) - (1000 * mercN / (2 * Math.PI));
-        return { x, y: y + 22 }; // 지도 중심 미세보정
-    };
+let calcOffset = 0;
+// 지도의 메르카토르 도법을 고려한 보정 상숫값
+const xy=(lat,lon)=>{
+    const x = (lon + 180) * (1000 / 360);
+    const y = (90 - lat) * (500 / 180);
+    return {x, y};
+};
 
-    function init() {
-        const wrap = document.getElementById('regions-wrap');
-        const pins = document.getElementById('pins-layer');
-        wrap.innerHTML = ''; pins.innerHTML = '';
+function buildDashboard() {
+  const wrap = document.getElementById('regionsWrap');
+  const pins = document.getElementById('pinsLayer');
+  wrap.innerHTML = ''; pins.innerHTML = '';
 
-        REGIONS.forEach(reg => {
-            const group = document.createElement('div');
-            group.className = 'region-group';
-            group.innerHTML = `<div class="region-title">${reg.label}</div><div class="grid" id="grid-${reg.id}"></div>`;
-            wrap.appendChild(group);
+  REGIONS.forEach(reg => {
+    const sec = document.createElement('div');
+    sec.innerHTML = `<div class="region-hdr"><div class="r-tag" style="color:${reg.color};border-color:${reg.color}66">${reg.label}</div><div class="r-line"></div></div><div class="cards-grid" id="grid-${reg.id}"></div>`;
+    wrap.appendChild(sec);
 
-            reg.cities.forEach((c, i) => {
-                const grid = document.getElementById(`grid-${reg.id}`);
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `<div class="card-top"><div class="city-name">${c.name}</div><div class="status" id="st-${reg.id}-${i}">OFF</div></div><div class="time" id="tm-${reg.id}-${i}">00:00</div><div class="date" id="dt-${reg.id}-${i}">---</div><div class="offset" id="of-${reg.id}-${i}">-0h vs Seoul</div>`;
-                grid.appendChild(card);
+    reg.cities.forEach((c, i) => {
+      if(c.name !== 'Seoul') {
+          const grid = document.getElementById(`grid-${reg.id}`);
+          const card = document.createElement('div');
+          card.className = 'c-card';
+          card.innerHTML = `<div class="c-top"><div><div class="c-name">${c.name}</div><div style="font-size:10px;color:var(--text-muted)">${c.country}</div></div><div class="w-ind" id="wi-${reg.id}-${i}">● OFF</div></div><div class="c-time" id="ct-${reg.id}-${i}">--:--</div><div style="font-size:10px;color:var(--text-dim)" id="cd-${reg.id}-${i}">--</div>`;
+          grid.appendChild(card);
+      }
 
-                const pos = getXY(c.lat, c.lon);
-                const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                dot.setAttribute("cx", pos.x); dot.setAttribute("cy", pos.y); dot.setAttribute("r", 4.5);
-                dot.setAttribute("fill", reg.color);
-                dot.style.filter = `drop-shadow(0 0 3px ${reg.color})`;
-                pins.appendChild(dot);
-                
-                const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                txt.setAttribute("x", pos.x + 8); txt.setAttribute("y", pos.y + 4);
-                txt.setAttribute("fill", "#fff"); txt.setAttribute("font-size", "11");
-                txt.setAttribute("font-weight", "600");
-                txt.style.textShadow = "0 0 3px #000, 0 0 5px #000";
-                txt.textContent = c.name;
-                pins.appendChild(txt);
-            });
-        });
-        update();
-        setInterval(update, 1000);
-    }
+      const pos = xy(c.lat, c.lon);
+      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dot.setAttribute("cx", pos.x); dot.setAttribute("cy", pos.y); dot.setAttribute("r", 4);
+      dot.setAttribute("fill", reg.color);
+      dot.innerHTML = `<title>${c.name}</title>`;
+      pins.appendChild(dot);
+      
+      const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      txt.setAttribute("x", pos.x + 6); txt.setAttribute("y", pos.y + 3);
+      txt.setAttribute("fill", "#fff"); txt.setAttribute("font-size", "10");
+      txt.setAttribute("font-weight", "600");
+      txt.style.textShadow = "0 0 3px #000";
+      txt.textContent = c.name;
+      pins.appendChild(txt);
+    });
+  });
+}
 
-    function update() {
-        const now = new Date(Date.now() + calcOffset);
-        const seoulTime = now.toLocaleTimeString('en-GB', {timeZone:'Asia/Seoul'});
-        document.getElementById('hdr-clock').textContent = seoulTime;
-        document.getElementById('seoul-time').textContent = seoulTime;
-        document.getElementById('seoul-date').textContent = now.toLocaleDateString('ko-KR', {weekday:'long', month:'long', day:'numeric'});
+function update() {
+  const now = new Date(Date.now() + calcOffset);
+  const seoulTime = now.toLocaleTimeString('en-GB', {timeZone:'Asia/Seoul'});
+  document.getElementById('hdrTime').textContent = seoulTime;
+  document.getElementById('seoulTime').textContent = seoulTime;
+  document.getElementById('seoulDate').textContent = now.toLocaleDateString('ko-KR', {weekday:'long', month:'long', day:'numeric'});
 
-        REGIONS.forEach(reg => {
-            reg.cities.forEach((c, i) => {
-                const timeStr = now.toLocaleTimeString('en-GB', {timeZone:c.tz, hour:'2-digit', minute:'2-digit'});
-                const hour = parseInt(timeStr.split(':')[0]);
-                const seoulNow = new Date(now.toLocaleString('en-US', {timeZone:'Asia/Seoul'}));
-                const cityNow = new Date(now.toLocaleString('en-US', {timeZone:c.tz}));
-                const diff = Math.round((cityNow - seoulNow) / 3600000);
+  REGIONS.forEach(reg => {
+    reg.cities.forEach((c, i) => {
+      const timeStr = now.toLocaleTimeString('en-GB', {timeZone:c.tz, hour:'2-digit', minute:'2-digit'});
+      const hour = parseInt(timeStr.split(':')[0]);
+      const cardTime = document.getElementById(`ct-${reg.id}-${i}`);
+      if(cardTime) cardTime.textContent = timeStr;
+      
+      const cardDate = document.getElementById(`cd-${reg.id}-${i}`);
+      if(cardDate) cardDate.textContent = now.toLocaleDateString('en-GB', {timeZone:c.tz, month:'short', day:'numeric'});
+      
+      const isOpen = hour >= 9 && hour < 18;
+      const ind = document.getElementById(`wi-${reg.id}-${i}`);
+      if(ind) {
+        ind.textContent = isOpen ? '● OPEN' : '● OFF';
+        ind.className = `w-ind ${isOpen ? 'on' : 'off'}`;
+      }
+    });
+  });
+}
 
-                document.getElementById(`tm-${reg.id}-${i}`).textContent = timeStr;
-                document.getElementById(`dt-${reg.id}-${i}`).textContent = now.toLocaleDateString('en-GB', {timeZone:c.tz, month:'short', day:'numeric'});
-                document.getElementById(`of-${reg.id}-${i}`).textContent = `${diff >= 0 ? '+' + diff : diff}h vs Seoul`;
-                const isOpen = hour >= 9 && hour < 18;
-                const st = document.getElementById(`st-${reg.id}-${i}`);
-                st.textContent = isOpen ? 'OPEN' : 'OFF';
-                st.className = `status ${isOpen ? 'on' : 'off'}`;
-            });
-        });
-    }
+function applyCalc() {
+  const val = document.getElementById('calcIn').value;
+  if(!val) return;
+  const [h, m] = val.split(':').map(Number);
+  const seoulNow = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+  const target = new Date(seoulNow);
+  target.setHours(h, m, 0, 0);
+  calcOffset = target - seoulNow;
+  update();
+}
 
-    function applyCalc() {
-        const val = document.getElementById('calc-input').value;
-        if(!val) return;
-        const [h, m] = val.split(':').map(Number);
-        const seoulNow = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
-        const target = seoulNow; target.setHours(h, m, 0, 0);
-        calcOffset = target - seoulNow; update();
-    }
+function resetCalc() { calcOffset = 0; update(); }
 
-    function resetCalc() { calcOffset = 0; document.getElementById('calc-input').value = ''; update(); }
-    init();
+buildDashboard();
+setInterval(update, 1000);
+update();
 </script>
 </body>
 </html>
