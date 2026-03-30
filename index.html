@@ -376,15 +376,17 @@ footer{margin-top:50px;padding-top:16px;border-top:1px solid var(--border);displ
 // ─── DATA ────────────────────────────────────────────────────────────────────
 const REGIONS=[
   {id:'am',label:'Americas',cities:[
-    {name:'Los Angeles',       country:'USA',            tz:'America/Los_Angeles',  lat:34.05, lon:-118.24},
-    {name:'San Francisco',     country:'USA',            tz:'America/Los_Angeles',  lat:37.77, lon:-122.42},
     {name:'Dominican Republic',country:'Dominican Rep.', tz:'America/Santo_Domingo',lat:18.48, lon:-69.93},
+    {name:'Los Angeles',       country:'USA',            tz:'America/Los_Angeles',  lat:34.05, lon:-118.24},
+    {name:'San Francisco',      country:'USA',            tz:'America/Los_Angeles',  lat:37.77, lon:-122.42},
   ]},
   {id:'eu',label:'Europe',cities:[
-    {name:'Barcelona', country:'Spain',       tz:'Europe/Madrid',    lat:41.38,lon:2.17},
-    {name:'Geneva',    country:'Switzerland', tz:'Europe/Zurich',    lat:46.20,lon:6.15},
-    {name:'Moscow',    country:'Russia',      tz:'Europe/Moscow',    lat:55.75,lon:37.62},
-    {name:'Stockholm', country:'Sweden',      tz:'Europe/Stockholm', lat:59.33,lon:18.07},
+    {name:'Amsterdam', country:'Netherlands', tz:'Europe/Amsterdam', lat:52.37, lon:4.90}, // 추가됨
+    {name:'Barcelona', country:'Spain',        tz:'Europe/Madrid',    lat:41.38, lon:2.17},
+    {name:'Geneva',    country:'Switzerland',  tz:'Europe/Zurich',    lat:46.20, lon:6.15},
+    {name:'London',    country:'UK',           tz:'Europe/London',    lat:51.51, lon:-0.13}, // 추가됨
+    {name:'Moscow',    country:'Russia',       tz:'Europe/Moscow',    lat:55.75, lon:37.62},
+    {name:'Stockholm', country:'Sweden',       tz:'Europe/Stockholm', lat:59.33, lon:18.07},
   ]},
   {id:'me',label:'Middle East & Africa',cities:[
     {name:'Angola',   country:'Angola',       tz:'Africa/Luanda',   lat:-8.83, lon:13.23},
@@ -394,9 +396,9 @@ const REGIONS=[
   ]},
   {id:'as',label:'Asia & Oceania',cities:[
     {name:'Melbourne',country:'Australia',tz:'Australia/Melbourne',lat:-37.81,lon:144.96},
-    {name:'Mumbai',   country:'India',    tz:'Asia/Kolkata',       lat:19.08, lon:72.88},
-    {name:'Shanghai', country:'China',    tz:'Asia/Shanghai',      lat:31.23, lon:121.47},
-    {name:'Sydney',   country:'Australia',tz:'Australia/Sydney',   lat:-33.87,lon:151.21},
+    {name:'Mumbai',   country:'India',     tz:'Asia/Kolkata',       lat:19.08, lon:72.88},
+    {name:'Shanghai', country:'China',     tz:'Asia/Shanghai',      lat:31.23, lon:121.47},
+    {name:'Sydney',   country:'Australia', tz:'Australia/Sydney',    lat:-33.87,lon:151.21},
   ]},
 ];
 const SEOUL={name:'Seoul',country:'South Korea',tz:'Asia/Seoul',lat:37.57,lon:126.98};
