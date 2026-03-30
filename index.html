@@ -28,12 +28,13 @@
         /* MAIN LAYOUT */
         .main-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; margin-top: 24px; }
         
-        /* MAP PANEL */
+        /* MAP PANEL (보내주신 이미지 지형 반영) */
         .map-panel { background: var(--card); border-radius: 16px; border: 1px solid var(--border-bright); padding: 25px; position: relative; }
         .panel-label { font-size: 11px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
         
         #world-svg { width: 100%; height: auto; background: #0d111a; border-radius: 10px; display: block; }
-        .land { fill: #1e2533; stroke: #2d364a; stroke-width: 0.4; }
+        /* 육지 색상을 보내주신 이미지처럼 밝은 회색으로 설정 */
+        .land { fill: #c0c0c0; stroke: #fff; stroke-width: 0.2; }
         
         /* SEOUL CARD */
         .seoul-card { background: var(--card); border-radius: 16px; border: 1px solid var(--accent-cyan); padding: 30px; text-align: center; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
