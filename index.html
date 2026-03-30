@@ -40,10 +40,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
 .panel-hdr{display:flex;align-items:center;gap:8px;margin-bottom:14px}
 .panel-title{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted)}
 #worldSvg{width:100%;height:auto;display:block;border-radius:8px}
-.map-tooltip{position:absolute;background:rgba(10,13,22,.97);border:1px solid var(--border-bright);border-radius:10px;padding:10px 14px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:20;min-width:140px;backdrop-filter:blur(8px)}
-.map-tooltip.show{opacity:1}
-.tt-city{font-size:13px;font-weight:600;color:var(--text)}
-.tt-time{font-family:'DM Mono',monospace;font-size:20px;color:var(--accent-cyan);letter-spacing:.03em;margin-top:3px}
 .right-col{display:flex;flex-direction:column;gap:14px}
 .seoul-panel{background:var(--card);border:1px solid rgba(255,109,157,.22);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden}
 .seoul-panel .panel-accent{background:linear-gradient(90deg,transparent,var(--region-kr),transparent);opacity:.7}
@@ -56,11 +52,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
 .seoul-badge.off{color:var(--text-dim);border-color:var(--inactive)}
 .s-dot{width:5px;height:5px;border-radius:50%}
 .seoul-badge.on .s-dot{background:var(--active);box-shadow:0 0 5px var(--active);animation:blink 2s infinite}
-.search-panel .panel-accent{background:linear-gradient(90deg,transparent,var(--accent-amber),transparent);opacity:.5}
-.search-row{display:flex;gap:8px;margin-bottom:10px}
-.search-input{flex:1;background:var(--bg3);border:1px solid var(--border-bright);border-radius:8px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;padding:9px 13px;outline:none;transition:border-color .2s}
-.search-btn{background:linear-gradient(135deg,var(--accent-amber),#ff8c42);border:none;border-radius:8px;color:#000;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;padding:9px 15px;cursor:pointer}
-.s-results{display:flex;flex-direction:column;gap:7px;max-height:260px;overflow-y:auto}
 .calc-section{margin-top:16px;background:var(--card);border:1px solid var(--border-bright);border-radius:16px;padding:20px 24px;position:relative;overflow:hidden}
 .calc-section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent-blue),var(--accent-cyan),transparent);opacity:.6}
 .calc-hdr{display:flex;align-items:center;gap:10px;margin-bottom:15px}
@@ -143,15 +134,6 @@ footer{margin-top:50px;padding-top:16px;border-top:1px solid var(--border);displ
       <div class="seoul-big-date" id="seoulBigDate">---</div>
       <div class="seoul-badge off" id="seoulBadge"><div class="s-dot"></div><span id="seoulBadgeLbl">OFF</span></div>
     </div>
-    <div class="panel search-panel">
-      <div class="panel-accent"></div>
-      <div class="panel-hdr"><span style="font-size:14px">🔍</span><span class="panel-title">도시 시간 검색</span></div>
-      <div class="search-row">
-        <input class="search-input" id="searchIn" type="text" placeholder="도시 이름 입력…">
-        <button class="search-btn" onclick="doSearch()">검색</button>
-      </div>
-      <div class="s-results" id="sResults"></div>
-    </div>
   </div>
 </div>
 <div class="calc-section">
@@ -208,7 +190,7 @@ function buildPins(){
     const {x,y}=xy(city.lat,city.lon); const col=RC[city.rid]||'#fff';
     const grp=document.createElementNS('http://www.w3.org/2000/svg','g');
     grp.setAttribute('transform',`translate(${x},${y})`);
-    grp.innerHTML=`<circle r="3" fill="${col}"/><text x="5" y="-5" fill="${col}" style="font-size:8px">${city.name.substring(0,5)}</text>`;
+    grp.innerHTML=`<circle r="3" fill="${col}"/><text x="5" y="-5" fill="${col}" style="font-size:8px; font-weight:600;">${city.name}</text>`;
     g.appendChild(grp);
   });
 }
@@ -231,6 +213,9 @@ function updateAll(){
   document.getElementById('hdrTime').textContent=fmtT(now,'Asia/Seoul');
   document.getElementById('seoulBigTime').textContent=fmtT(now,'Asia/Seoul');
   document.getElementById('seoulBigDate').textContent=fmtD(now,'Asia/Seoul');
+  const sw=isWork(now,'Asia/Seoul');
+  document.getElementById('seoulBadge').className=`seoul-badge ${sw?'on':'off'}`;
+  document.getElementById('seoulBadgeLbl').textContent=sw?'OPEN':'OFF';
   REGIONS.forEach(r=>r.cities.forEach((city,ci)=>{
     const tEl=document.getElementById(`ct-${r.id}-${ci}`);
     const dEl=document.getElementById(`cd-${r.id}-${ci}`);
@@ -247,7 +232,6 @@ function applyCalc(){
   document.getElementById('calcBadge').classList.add('on'); updateAll();
 }
 function resetCalc(){calcOffset=0; document.getElementById('calcIn').value=''; document.getElementById('calcBadge').classList.remove('on'); updateAll();}
-function doSearch(){const q=document.getElementById('searchIn').value.toLowerCase(); alert('준비중인 기능입니다. 기본 리스트를 확인해주세요.');}
 buildRegions(); buildPins(); updateAll(); setInterval(updateAll,1000);
 </script>
 </body>
