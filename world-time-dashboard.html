@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global OPS · World Time</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0b0d14;
+  --ink2:#11131e;
+  --ink3:#181c2a;
+  --ink4:#1f2436;
+  --rim:rgba(255,255,255,0.07);
+  --rim2:rgba(255,255,255,0.13);
+  --dim:#3d4560;
+  --muted:#5e6a88;
+  --sub:#8994b0;
+  --body:#c8cfdf;
+  --hi:#edf0f8;
+  --white:#ffffff;
+  --c1:#5b9cf6;   /* blue  – Americas  */
+  --c2:#9d7cf5;   /* violet – Europe  */
+  --c3:#f5a541;   /* amber – ME/Africa */
+  --c4:#3ecfaa;   /* teal  – Asia/Pac  */
+  --c5:#f06292;   /* rose  – Seoul     */
+  --go:#2ecc71;
+  --go-dim:rgba(46,204,113,0.15);
+  --go-rim:rgba(46,204,113,0.35);
+  --r:14px;
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--body);
+  font-family:'Syne',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* subtle dot-grid bg */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;z-index:0;
+}
+/* ambient glows */
+body::after{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 900px 600px at 10% 15%,rgba(91,156,246,.05),transparent 70%),
+    radial-gradient(ellipse 700px 500px at 90% 80%,rgba(62,207,170,.04),transparent 70%);
+  pointer-events:none;z-index:0;
+}
+.page{position:relative;z-index:1;max-width:1520px;margin:0 auto;padding:0 28px 100px}
+
+/* ── HEADER ── */
+.hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:26px 0 22px;border-bottom:1px solid var(--rim);
+  flex-wrap:wrap;gap:14px;
+}
+.hdr-brand{display:flex;align-items:center;gap:13px}
+.brand-icon{
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--c1),var(--c4));
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:800;color:#000;letter-spacing:-.02em;
+}
+.brand-name{font-size:14px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--hi)}
+.brand-sub{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.hdr-seoul{display:flex;align-items:center;gap:12px}
+.hdr-seoul-label{
+  text-align:right;
+}
+.hdr-seoul-tag{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.hdr-seoul-time{
+  font-family:'JetBrains Mono',monospace;
+  font-size:24px;font-weight:400;
+  color:var(--c4);letter-spacing:.02em;line-height:1;
+}
+.hdr-seoul-date{font-size:10px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace;letter-spacing:.06em}
+.live-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+  background:var(--go);
+  box-shadow:0 0 0 3px var(--go-dim);
+  animation:lv 2.4s ease-in-out infinite;
+}
+@keyframes lv{0%,100%{box-shadow:0 0 0 3px var(--go-dim)}50%{box-shadow:0 0 0 6px rgba(46,204,113,.08)}}
+
+/* ── TOP GRID: MAP + RIGHT ── */
+.top{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-top:20px}
+
+/* ── MAP CARD ── */
+.map-card{
+  background:var(--ink2);border:1px solid var(--rim);border-radius:var(--r);
+  padding:18px 20px;position:relative;overflow:hidden;
+}
+.map-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 0%,var(--c4) 40%,var(--c1) 60%,transparent 100%);
+  opacity:.45;
+}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.card-head-title{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.card-head-note{font-size:9px;color:var(--dim);letter-spacing:.06em;margin-left:2px}
+
+/* SVG map wrapper */
+#mapWrap{position:relative}
+#worldSvg{width:100%;height:auto;display:block;border-radius:8px;overflow:visible}
+
+/* Tooltip */
+.mtt{
+  position:absolute;
+  background:rgba(11,13,20,.96);border:1px solid var(--rim2);
+  border-radius:10px;padding:11px 14px;
+  pointer-events:none;opacity:0;
+  transition:opacity .14s ease;z-index:30;min-width:148px;
+  backdrop-filter:blur(12px);
+}
+.mtt.show{opacity:1}
+.mtt-city{font-size:13px;font-weight:700;color:var(--hi)}
+.mtt-country{font-size:10px;color:var(--muted);margin-top:1px;letter-spacing:.04em}
+.mtt-time{font-family:'JetBrains Mono',monospace;font-size:21px;color:var(--c4);margin-top:7px;letter-spacing:.02em}
+.mtt-date{font-size:10px;color:var(--muted);margin-top:2px;font-family:'JetBrains Mono',monospace}
+.mtt-status{display:inline-flex;align-items:center;gap:4px;margin-top:7px;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.12em;border:1px solid}
+.mtt-status.on{color:var(--go);border-color:var(--go-rim);background:var(--go-dim)}
+.mtt-status.off{color:var(--dim);border-color:var(--rim)}
+.mtt-dot{width:4px;height:4px;border-radius:50%}
+.mtt-status.on .mtt-dot{background:var(--go);animation:lv 2s infinite}
+.mtt-status.off .mtt-dot{background:var(--dim)}
+
+/* ── RIGHT COLUMN ── */
+.right-col{display:flex;flex-direction:column;gap:12px}
+
+/* ── SEOUL CARD ── */
+.seoul-card{
+  background:var(--ink2);border:1px solid rgba(240,98,146,.18);
+  border-radius:var(--r);padding:20px 22px;position:relative;overflow:hidden;
+}
+.seoul-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--c5),transparent);opacity:.65;
+}
+.sc-tag{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--c5);opacity:.85}
+.sc-flag{font-size:26px;margin:8px 0 6px}
+.sc-city{font-size:20px;font-weight:800;color:var(--hi);letter-spacing:-.01em}
+.sc-sub{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:3px;margin-bottom:14px}
+.sc-time{font-family:'JetBrains Mono',monospace;font-size:40px;font-weight:400;color:var(--white);letter-spacing:-.03em;line-height:1}
+.sc-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-top:7px;letter-spacing:.06em}
+.sc-badge{display:inline-flex;align-items:center;gap:5px;margin-top:11px;padding:3px 10px;border-radius:20px;border:1px solid;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.sc-badge.on{color:var(--go);border-color:var(--go-rim);background:var(--go-dim)}
+.sc-badge.off{color:var(--dim);border-color:var(--rim)}
+.sc-badge .sc-dot{width:5px;height:5px;border-radius:50%}
+.sc-badge.on .sc-dot{background:var(--go);box-shadow:0 0 5px var(--go);animation:lv 2s infinite}
+.sc-badge.off .sc-dot{background:var(--dim)}
+
+/* ── SEARCH CARD ── */
+.search-card{
+  background:var(--ink2);border:1px solid var(--rim);
+  border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden;
+  flex:1;
+}
+.search-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--c3),transparent);opacity:.45;
+}
+.search-row{display:flex;gap:7px;margin-bottom:9px}
+.search-inp{
+  flex:1;background:var(--ink3);border:1px solid var(--rim);border-radius:8px;
+  color:var(--hi);font-family:'Syne',sans-serif;font-size:13px;padding:8px 12px;
+  outline:none;transition:border-color .18s,box-shadow .18s;
+}
+.search-inp:focus{border-color:var(--c3);box-shadow:0 0 0 3px rgba(245,165,65,.1)}
+.search-inp::placeholder{color:var(--dim)}
+.search-go{
+  background:var(--c3);border:none;border-radius:8px;
+  color:#000;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:.1em;padding:8px 14px;cursor:pointer;
+  transition:opacity .18s,transform .15s;white-space:nowrap;
+}
+.search-go:hover{opacity:.86;transform:translateY(-1px)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.chip{
+  background:var(--ink3);border:1px solid var(--rim);border-radius:6px;
+  padding:3px 9px;font-size:9px;color:var(--muted);cursor:pointer;
+  transition:all .15s;letter-spacing:.04em;font-weight:600;
+}
+.chip:hover{border-color:var(--c3);color:var(--c3)}
+.s-list{display:flex;flex-direction:column;gap:6px;max-height:245px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--rim) transparent}
+.s-item{
+  background:var(--ink3);border:1px solid var(--rim);border-radius:9px;
+  padding:10px 12px;display:flex;align-items:center;gap:10px;
+  animation:up .22s ease both;
+}
+@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.si-info{flex:1;min-width:0}
+.si-city{font-size:13px;font-weight:700;color:var(--hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.si-country{font-size:9px;color:var(--muted);letter-spacing:.06em;margin-top:2px}
+.si-right{text-align:right;flex-shrink:0}
+.si-time{font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--c4);letter-spacing:.02em}
+.si-date{font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.si-badge{display:inline-flex;align-items:center;gap:3px;margin-top:4px;padding:2px 7px;border-radius:20px;border:1px solid;font-size:8px;font-weight:700;letter-spacing:.1em}
+.si-badge.on{color:var(--go);border-color:var(--go-rim);background:var(--go-dim)}
+.si-badge.off{color:var(--dim);border-color:var(--rim)}
+.si-rm{background:none;border:none;color:var(--dim);cursor:pointer;font-size:16px;padding:2px;transition:color .15s;line-height:1;flex-shrink:0}
+.si-rm:hover{color:#ef4444}
+.s-empty{font-size:11px;color:var(--dim);text-align:center;padding:20px 0;letter-spacing:.04em;line-height:1.8}
+
+/* ── CALC BAR ── */
+.calc-bar{
+  margin-top:14px;background:var(--ink2);border:1px solid var(--rim);
+  border-radius:var(--r);padding:18px 22px;position:relative;overflow:hidden;
+}
+.calc-bar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--c1),var(--c4),transparent);opacity:.45;
+}
+.calc-inner{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.calc-lbl{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.calc-inp{
+  background:var(--ink3);border:1px solid var(--rim);border-radius:8px;
+  color:var(--hi);font-family:'JetBrains Mono',monospace;font-size:14px;
+  padding:7px 13px;outline:none;width:140px;
+  transition:border-color .18s,box-shadow .18s;
+}
+.calc-inp:focus{border-color:var(--c4);box-shadow:0 0 0 3px rgba(62,207,170,.1)}
+.calc-inp::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer}
+.calc-apply{
+  background:linear-gradient(135deg,var(--c1),var(--c4));border:none;border-radius:8px;
+  color:#000;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;padding:8px 18px;cursor:pointer;
+  transition:opacity .18s,transform .15s;
+}
+.calc-apply:hover{opacity:.86;transform:translateY(-1px)}
+.calc-rst{
+  background:transparent;border:1px solid var(--rim);border-radius:8px;
+  color:var(--muted);font-family:'Syne',sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.08em;padding:7px 13px;cursor:pointer;transition:all .18s;
+}
+.calc-rst:hover{border-color:var(--sub);color:var(--hi)}
+.preview-pill{
+  display:none;align-items:center;gap:5px;
+  background:rgba(245,165,65,.1);border:1px solid rgba(245,165,65,.3);
+  border-radius:6px;padding:3px 10px;
+  font-size:9px;font-weight:700;color:var(--c3);letter-spacing:.12em;
+}
+.preview-pill.on{display:flex}
+
+/* ── REGIONS ── */
+.regions{margin-top:22px;display:flex;flex-direction:column;gap:28px}
+.region-wrap{}
+.region-hdr{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.rh-line{flex:1;height:1px;background:var(--rim)}
+.rh-pill{
+  display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;
+  border:1px solid;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+}
+.rh-dot{width:5px;height:5px;border-radius:50%}
+.rh-count{font-size:9px;color:var(--dim);letter-spacing:.06em}
+.region-am .rh-pill{color:var(--c1);border-color:rgba(91,156,246,.28);background:rgba(91,156,246,.06)}
+.region-am .rh-dot{background:var(--c1)}
+.region-eu .rh-pill{color:var(--c2);border-color:rgba(157,124,245,.28);background:rgba(157,124,245,.06)}
+.region-eu .rh-dot{background:var(--c2)}
+.region-me .rh-pill{color:var(--c3);border-color:rgba(245,165,65,.28);background:rgba(245,165,65,.06)}
+.region-me .rh-dot{background:var(--c3)}
+.region-as .rh-pill{color:var(--c4);border-color:rgba(62,207,170,.28);background:rgba(62,207,170,.06)}
+.region-as .rh-dot{background:var(--c4)}
+
+/* City grid */
+.city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:9px}
+.city-card{
+  background:var(--ink2);border:1px solid var(--rim);border-radius:12px;
+  padding:15px 17px;position:relative;overflow:hidden;
+  transition:border-color .22s,background .22s,transform .2s;
+  animation:up .35s ease both;
+}
+.city-card:hover{background:var(--ink3);border-color:var(--rim2);transform:translateY(-2px)}
+.city-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  opacity:0;transition:opacity .22s;
+}
+.city-card:hover::after{opacity:1}
+.region-am .city-card::after{background:linear-gradient(90deg,transparent,var(--c1),transparent)}
+.region-eu .city-card::after{background:linear-gradient(90deg,transparent,var(--c2),transparent)}
+.region-me .city-card::after{background:linear-gradient(90deg,transparent,var(--c3),transparent)}
+.region-as .city-card::after{background:linear-gradient(90deg,transparent,var(--c4),transparent)}
+
+.cc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.cc-name{font-size:13px;font-weight:700;color:var(--hi);line-height:1.2}
+.cc-country{font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+.w-pill{display:flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;border:1px solid;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
+.w-pill.on{color:var(--go);border-color:var(--go-rim);background:var(--go-dim)}
+.w-pill.off{color:var(--dim);border-color:var(--rim)}
+.wd{width:4px;height:4px;border-radius:50%}
+.w-pill.on .wd{background:var(--go);box-shadow:0 0 4px var(--go);animation:lv 2s infinite}
+.w-pill.off .wd{background:var(--dim)}
+.cc-time{font-family:'JetBrains Mono',monospace;font-size:25px;font-weight:400;color:var(--body);letter-spacing:-.02em;line-height:1;margin-bottom:4px;transition:color .2s}
+.city-card:hover .cc-time{color:var(--white)}
+.cc-date{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.06em}
+.cc-off{font-size:8px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-top:6px;letter-spacing:.04em}
+
+/* ── FOOTER ── */
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--rim);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.ft{font-size:10px;color:var(--dim);letter-spacing:.06em}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){.top{grid-template-columns:1fr}}
+@media(max-width:720px){
+  .page{padding:0 14px 60px}
+  .city-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px}
+  .cc-time{font-size:21px}.city-card{padding:12px 13px}
+}
+@media(max-width:480px){
+  .city-grid{grid-template-columns:1fr 1fr}
+  .calc-inner{flex-direction:column;align-items:flex-start}
+  .calc-inp{width:100%}
+  .search-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ── HEADER ── -->
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="brand-icon">G</div>
+    <div>
+      <div class="brand-name">Global OPS</div>
+      <div class="brand-sub">World Time Dashboard</div>
+    </div>
+  </div>
+  <div class="hdr-seoul">
+    <div class="hdr-seoul-label">
+      <div class="hdr-seoul-tag">🇰🇷 Seoul KST — Base</div>
+      <div class="hdr-seoul-time" id="hdrT">--:--:--</div>
+      <div class="hdr-seoul-date" id="hdrD">---</div>
+    </div>
+    <div class="live-dot"></div>
+  </div>
+</header>
+
+<!-- ── TOP: MAP + RIGHT ── -->
+<div class="top">
+
+  <!-- MAP -->
+  <div class="map-card">
+    <div class="card-head">
+      <span style="font-size:13px">🌍</span>
+      <span class="card-head-title">Live City Map</span>
+      <span class="card-head-note">— hover pins</span>
+    </div>
+    <div id="mapWrap">
+      <!-- World map using Robinson-like equirectangular projection -->
+      <!-- Accurate Natural Earth simplified paths -->
+      <svg id="worldSvg" viewBox="0 0 2000 1001" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="oceanGrad" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" stop-color="#0d1525"/>
+            <stop offset="100%" stop-color="#080c18"/>
+          </radialGradient>
+        </defs>
+        <!-- Ocean -->
+        <rect width="2000" height="1001" fill="url(#oceanGrad)"/>
+        <!-- Graticule (every 30°) -->
+        <g stroke="rgba(255,255,255,0.04)" stroke-width="0.8" fill="none">
+          <!-- Horizontal lines lat: 60, 30, 0, -30, -60 -->
+          <line x1="0" y1="167" x2="2000" y2="167"/>
+          <line x1="0" y1="334" x2="2000" y2="334"/>
+          <line x1="0" y1="501" x2="2000" y2="501"/>
+          <line x1="0" y1="667" x2="2000" y2="667"/>
+          <line x1="0" y1="834" x2="2000" y2="834"/>
+          <!-- Vertical lines lon: -150,-120,-90,-60,-30,0,30,60,90,120,150 -->
+          <line x1="167" y1="0" x2="167" y2="1001"/>
+          <line x1="333" y1="0" x2="333" y2="1001"/>
+          <line x1="500" y1="0" x2="500" y2="1001"/>
+          <line x1="667" y1="0" x2="667" y2="1001"/>
+          <line x1="833" y1="0" x2="833" y2="1001"/>
+          <line x1="1000" y1="0" x2="1000" y2="1001"/>
+          <line x1="1167" y1="0" x2="1167" y2="1001"/>
+          <line x1="1333" y1="0" x2="1333" y2="1001"/>
+          <line x1="1500" y1="0" x2="1500" y2="1001"/>
+          <line x1="1667" y1="0" x2="1667" y2="1001"/>
+          <line x1="1833" y1="0" x2="1833" y2="1001"/>
+        </g>
+        <!-- Equator highlight -->
+        <line x1="0" y1="501" x2="2000" y2="501" stroke="rgba(62,207,170,0.12)" stroke-width="1.2" stroke-dasharray="6,9"/>
+
+        <!-- ═══════ LAND PATHS (Simplified Natural Earth) ═══════ -->
+        <!-- All coordinates use: x=(lon+180)/360*2000, y=(90-lat)/180*1001 -->
+
+        <!-- NORTH AMERICA -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.8"
+          d="M278,133 L310,125 L345,118 L390,112 L430,115 L458,122 L478,134 L492,150 
+             L500,170 L504,192 L502,214 L494,232 L482,248 L466,260 L450,274 L436,290 
+             L424,308 L414,328 L406,348 L396,365 L384,374 L372,368 L360,354 L350,336 
+             L340,316 L328,298 L314,282 L298,268 L282,256 L268,244 L256,232 L246,216 
+             L238,198 L232,178 L230,158 L232,140 L242,130 L258,126 Z"/>
+        <!-- Alaska peninsula -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"
+          d="M120,148 L158,138 L190,132 L218,128 L236,130 L232,140 L218,146 L200,148 
+             L180,152 L158,156 L140,158 L122,158 Z"/>
+        <!-- Aleutians hint -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.6"
+          d="M80,170 L100,166 L120,162 L138,160 L136,168 L116,172 L92,176 Z"/>
+        <!-- Florida peninsula -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M394,304 L406,300 L412,312 L410,326 L400,334 L390,326 L386,312 Z"/>
+        <!-- Baja California -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M244,280 L250,272 L256,280 L258,296 L254,312 L244,320 L238,308 L238,294 Z"/>
+        <!-- Cuba -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M400,372 L420,368 L434,374 L432,384 L414,386 L398,382 Z"/>
+        <!-- Hispaniola (Dominican Republic) -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M438,378 L454,374 L462,380 L458,390 L442,392 L436,385 Z"/>
+        <!-- Central America -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M334,374 L350,370 L366,376 L374,390 L368,404 L354,410 L340,404 L330,390 Z"/>
+        <!-- Greenland -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"
+          d="M380,30 L420,22 L460,20 L492,28 L506,44 L502,62 L486,76 L462,82 
+             L436,80 L408,70 L386,56 L376,42 Z"/>
+
+        <!-- SOUTH AMERICA -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.8"
+          d="M346,402 L374,392 L404,390 L432,396 L456,408 L476,424 L492,444 
+             L504,468 L512,494 L516,522 L514,550 L506,576 L492,600 L474,622 
+             L452,640 L428,652 L402,658 L376,652 L354,638 L336,618 L322,594 
+             L312,566 L306,536 L304,504 L306,472 L312,444 L322,420 L334,408 Z"/>
+        <!-- Tierra del Fuego -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M352,764 L370,758 L384,766 L382,780 L364,784 L350,776 Z"/>
+
+        <!-- EUROPE -->
+        <!-- Iberian Peninsula -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"
+          d="M828,270 L860,264 L892,266 L910,278 L916,296 L912,316 L896,330 
+             L874,336 L852,332 L834,320 L824,302 L824,284 Z"/>
+        <!-- France mainland -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"
+          d="M892,248 L916,242 L940,244 L956,256 L960,272 L952,286 L934,294 
+             L912,296 L898,286 L888,270 Z"/>
+        <!-- British Isles -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M852,190 L870,184 L886,190 L888,206 L878,216 L860,218 L848,208 Z"/>
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M836,198 L844,194 L848,202 L842,210 L834,206 Z"/>
+        <!-- Ireland -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M820,196 L832,192 L836,200 L830,210 L818,206 Z"/>
+        <!-- Scandinavia -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"
+          d="M920,100 L950,90 L980,88 L1006,98 L1012,116 L1004,136 L988,148 
+             L964,156 L940,156 L920,144 L910,126 L912,110 Z"/>
+        <!-- Denmark -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M946,180 L958,176 L964,184 L958,194 L946,192 Z"/>
+        <!-- Central Europe (Germany, Poland, CZ, etc) -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"
+          d="M916,196 L960,186 L1006,184 L1040,192 L1056,206 L1054,222 
+             L1040,232 L1012,238 L980,240 L952,238 L924,232 L908,218 Z"/>
+        <!-- Benelux bump -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M892,196 L916,192 L920,204 L908,212 L890,208 Z"/>
+        <!-- Italy -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"
+          d="M940,256 L960,248 L980,250 L992,264 L988,282 L976,298 L958,308 
+             L944,300 L936,282 L936,264 Z"/>
+        <!-- Italy boot toe -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M966,310 L978,308 L986,318 L980,330 L966,326 Z"/>
+        <!-- Sicily -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M944,322 L960,318 L966,328 L958,338 L942,334 Z"/>
+        <!-- Balkans / SE Europe -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"
+          d="M1008,218 L1040,210 L1068,214 L1086,228 L1084,248 L1070,260 
+             L1044,264 L1018,256 L1004,240 Z"/>
+        <!-- Greece peninsula -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M1022,272 L1036,268 L1044,278 L1038,294 L1022,292 Z"/>
+        <!-- Romania / Moldova -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M1060,202 L1090,196 L1112,202 L1118,218 L1108,232 L1082,236 L1060,228 Z"/>
+
+        <!-- RUSSIA / NORTH EURASIA (big sweep) -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.8"
+          d="M1000,56 L1080,44 L1160,36 L1240,30 L1320,28 L1400,32 L1480,38 
+             L1560,46 L1620,54 L1660,66 L1676,84 L1668,104 L1640,118 L1600,126 
+             L1550,130 L1490,128 L1420,122 L1340,118 L1260,118 L1180,120 
+             L1100,124 L1030,128 L980,132 L960,148 L952,164 L944,156 L940,140 
+             L950,122 L972,108 L992,94 L996,76 Z"/>
+        <!-- Kamchatka -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.6"
+          d="M1680,100 L1700,92 L1714,100 L1716,120 L1704,138 L1688,136 L1678,120 Z"/>
+        <!-- Ukraine / Caucasus -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"
+          d="M1080,172 L1140,162 L1200,160 L1240,168 L1260,180 L1252,196 
+             L1220,204 L1180,206 L1140,200 L1100,192 Z"/>
+
+        <!-- TURKEY -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"
+          d="M1068,260 L1120,252 L1174,250 L1210,258 L1222,272 L1214,290 
+             L1190,300 L1152,302 L1116,296 L1082,284 L1066,272 Z"/>
+        <!-- Cyprus -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"
+          d="M1112,312 L1124,308 L1130,316 L1122,322 L1110,318 Z"/>
+
+        <!-- MIDDLE EAST -->
+        <!-- Iraq / Syria / Jordan -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"
+          d="M1146,294 L1192,288 L1230,288 L1256,298 L1262,314 L1250,332 
+             L1220,342 L1186,340 L1156,330 L1140,314 Z"/>
+        <!-- Arabian Peninsula -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.8"
+          d="M1160,332 L1210,324 L1260,320 L1300,330 L1328,348 L1344,368 
+             L1348,394 L1340,420 L1318,444 L1290,460 L1256,466 L1220,458 
+             L1188,440 L1166,414 L1152,386 L1148,358 Z"/>
+        <!-- Iran -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"
+          d="M1222,272 L1280,262 L1332,264 L1368,278 L1382,298 L1378,322 
+             L1356,340 L1318,350 L1278,350 L1240,340 L1214,322 L1212,300 Z"/>
+
+        <!-- AFRICA -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.09)" stroke-width="0.9"
+          d="M892,336 L940,326 L988,322 L1036,328 L1080,340 L1118,358 L1136,380 
+             L1134,406 L1120,430 L1100,454 L1080,478 L1058,502 L1040,528 
+             L1026,556 L1016,586 L1010,618 L1008,652 L1010,686 L1014,718 
+             L1016,748 L1010,772 L996,790 L976,800 L952,800 L928,788 
+             L908,768 L892,744 L878,716 L866,684 L858,650 L854,614 
+             L854,578 L856,542 L860,506 L864,470 L864,434 L862,398 
+             L860,364 L866,346 L882,338 Z"/>
+        <!-- Madagascar -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M1086,596 L1100,582 L1114,588 L1120,612 L1118,638 L1106,656 
+             L1092,654 L1082,636 L1080,612 Z"/>
+
+        <!-- SOUTH ASIA -->
+        <!-- Pakistan -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"
+          d="M1282,304 L1330,294 L1372,294 L1400,308 L1410,328 L1400,350 
+             L1368,364 L1326,368 L1290,360 L1272,340 L1274,318 Z"/>
+        <!-- India subcontinent -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.09)" stroke-width="0.8"
+          d="M1326,330 L1380,318 L1420,322 L1454,336 L1470,358 L1474,384 
+             L1468,412 L1454,438 L1434,460 L1408,476 L1378,484 L1348,480 
+             L1322,464 L1302,440 L1290,412 L1286,382 L1292,354 Z"/>
+        <!-- Sri Lanka -->
+        <ellipse cx="1410" cy="500" rx="10" ry="16" fill="#1a2235" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+
+        <!-- SOUTHEAST ASIA -->
+        <!-- Myanmar / Thailand / Indochina -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"
+          d="M1466,340 L1510,330 L1548,332 L1574,346 L1580,368 L1570,392 
+             L1550,410 L1524,420 L1494,418 L1466,404 L1448,382 L1452,358 Z"/>
+        <!-- Malay peninsula -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M1530,410 L1548,404 L1558,418 L1556,444 L1544,462 L1530,460 L1520,446 L1522,426 Z"/>
+        <!-- Borneo -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M1556,426 L1600,412 L1636,414 L1652,432 L1650,458 L1632,474 
+             L1600,480 L1566,470 L1548,450 Z"/>
+        <!-- Sumatra -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M1444,474 L1492,460 L1538,458 L1558,470 L1556,490 L1530,504 
+             L1486,508 L1452,496 L1440,480 Z"/>
+        <!-- Java -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M1526,514 L1572,506 L1612,508 L1624,518 L1612,528 L1568,530 L1524,524 Z"/>
+        <!-- Philippines -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M1612,348 L1634,336 L1652,342 L1658,360 L1648,378 L1628,382 L1612,368 Z"/>
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M1632,384 L1648,378 L1656,394 L1644,406 L1630,400 Z"/>
+
+        <!-- CHINA / EAST ASIA -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.09)" stroke-width="0.9"
+          d="M1380,210 L1440,198 L1510,192 L1580,192 L1640,202 L1690,218 
+             L1720,238 L1724,260 L1706,280 L1672,294 L1628,302 L1576,304 
+             L1524,300 L1480,290 L1440,278 L1400,264 L1372,246 L1368,228 Z"/>
+        <!-- Korean Peninsula -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"
+          d="M1680,230 L1700,222 L1718,228 L1720,248 L1712,262 L1692,266 
+             L1674,256 L1672,240 Z"/>
+        <!-- Japan main (Honshu) -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"
+          d="M1730,200 L1764,188 L1790,192 L1800,208 L1790,226 L1764,234 
+             L1740,230 L1726,218 Z"/>
+        <!-- Kyushu -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M1726,238 L1742,234 L1750,244 L1744,256 L1728,254 Z"/>
+        <!-- Hokkaido -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M1764,168 L1790,160 L1808,168 L1810,184 L1792,192 L1768,188 Z"/>
+        <!-- Taiwan -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M1660,304 L1672,298 L1680,308 L1676,322 L1662,320 Z"/>
+
+        <!-- AUSTRALIA -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.09)" stroke-width="0.9"
+          d="M1556,546 L1620,530 L1690,526 L1754,534 L1806,552 L1840,578 
+             L1856,610 L1852,646 L1834,678 L1804,704 L1766,722 L1722,730 
+             L1674,728 L1626,716 L1582,694 L1548,664 L1526,628 L1520,590 Z"/>
+        <!-- Tasmania -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"
+          d="M1720,754 L1736,748 L1748,758 L1744,772 L1726,774 L1714,764 Z"/>
+        <!-- New Zealand North -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M1876,672 L1894,660 L1906,670 L1904,686 L1888,692 L1874,684 Z"/>
+        <!-- New Zealand South -->
+        <path fill="#1a2235" stroke="rgba(255,255,255,0.07)" stroke-width="0.6"
+          d="M1874,700 L1894,694 L1908,706 L1906,728 L1888,738 L1870,728 
+             L1864,714 Z"/>
+
+        <!-- PINS rendered by JS -->
+        <g id="pinsG"></g>
+      </svg>
+      <div class="mtt" id="mtt">
+        <div class="mtt-city" id="mttCity">—</div>
+        <div class="mtt-country" id="mttCountry">—</div>
+        <div class="mtt-time" id="mttTime">--:--:--</div>
+        <div class="mtt-date" id="mttDate">---</div>
+        <div class="mtt-status off" id="mttStatus">
+          <span class="mtt-dot"></span><span id="mttLbl">OFF</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="right-col">
+
+    <!-- SEOUL CARD -->
+    <div class="seoul-card">
+      <div class="sc-tag">🏠 Home Base</div>
+      <div class="sc-flag">🇰🇷</div>
+      <div class="sc-city">Seoul</div>
+      <div class="sc-sub">South Korea · KST (UTC+9)</div>
+      <div class="sc-time" id="scTime">--:--:--</div>
+      <div class="sc-date" id="scDate">---</div>
+      <div class="sc-badge off" id="scBadge">
+        <div class="sc-dot"></div>
+        <span id="scLbl">OFF</span>
+      </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-card">
+      <div class="card-head" style="margin-bottom:11px">
+        <span style="font-size:13px">🔍</span>
+        <span class="card-head-title">도시 시간 검색</span>
+      </div>
+      <div class="search-row">
+        <input class="search-inp" id="sIn" type="text" placeholder="Tokyo, Paris, New York…" autocomplete="off">
+        <button class="search-go" onclick="doSearch()">검색</button>
+      </div>
+      <div class="chips">
+        <span class="chip" onclick="qs('Tokyo')">Tokyo</span>
+        <span class="chip" onclick="qs('New York')">New York</span>
+        <span class="chip" onclick="qs('London')">London</span>
+        <span class="chip" onclick="qs('Singapore')">Singapore</span>
+        <span class="chip" onclick="qs('Hong Kong')">HK</span>
+        <span class="chip" onclick="qs('Bangkok')">Bangkok</span>
+        <span class="chip" onclick="qs('Cairo')">Cairo</span>
+        <span class="chip" onclick="qs('São Paulo')">São Paulo</span>
+      </div>
+      <div class="s-list" id="sList">
+        <div class="s-empty">검색한 도시의 현재 시간이<br>여기에 표시됩니다</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── CALC BAR ── -->
+<div class="calc-bar">
+  <div class="calc-inner">
+    <span class="calc-lbl">⏱ 시차 계산기</span>
+    <span style="font-size:11px;color:var(--dim);letter-spacing:.04em">서울 시각 입력 →</span>
+    <input type="time" class="calc-inp" id="calcIn">
+    <button class="calc-apply" onclick="applyCalc()">전체 적용</button>
+    <button class="calc-rst" onclick="resetCalc()">실시간 복귀</button>
+    <span class="preview-pill" id="prevPill"><span>⚡</span> PREVIEW</span>
+  </div>
+</div>
+
+<!-- ── REGIONS ── -->
+<div class="regions" id="regionsEl"></div>
+
+<footer>
+  <span class="ft">© 2025 Global OPS Dashboard</span>
+  <span class="ft">17 cities · 4 regions · 1s refresh</span>
+</footer>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const REGIONS = [
+  { id:'am', label:'Americas', cities:[
+    { name:'Los Angeles',        country:'USA',            tz:'America/Los_Angeles',   lat:34.052, lon:-118.244 },
+    { name:'San Francisco',      country:'USA',            tz:'America/Los_Angeles',   lat:37.774, lon:-122.419 },
+    { name:'Dominican Republic', country:'Dominican Rep.', tz:'America/Santo_Domingo', lat:18.474, lon:-69.931  },
+  ]},
+  { id:'eu', label:'Europe', cities:[
+    { name:'Amsterdam',  country:'Netherlands', tz:'Europe/Amsterdam', lat:52.374, lon:4.890   },
+    { name:'Barcelona',  country:'Spain',       tz:'Europe/Madrid',    lat:41.385, lon:2.173   },
+    { name:'Geneva',     country:'Switzerland', tz:'Europe/Zurich',    lat:46.204, lon:6.143   },
+    { name:'London',     country:'UK',          tz:'Europe/London',    lat:51.507, lon:-0.128  },
+    { name:'Moscow',     country:'Russia',      tz:'Europe/Moscow',    lat:55.751, lon:37.618  },
+    { name:'Stockholm',  country:'Sweden',      tz:'Europe/Stockholm', lat:59.333, lon:18.065  },
+  ]},
+  { id:'me', label:'Middle East & Africa', cities:[
+    { name:'Angola',   country:'Angola',       tz:'Africa/Luanda',   lat:-8.836,  lon:13.234  },
+    { name:'Dubai',    country:'UAE',          tz:'Asia/Dubai',      lat:25.204,  lon:55.271  },
+    { name:'Istanbul', country:'Türkiye',      tz:'Europe/Istanbul', lat:41.015,  lon:28.979  },
+    { name:'Riyadh',   country:'Saudi Arabia', tz:'Asia/Riyadh',     lat:24.688,  lon:46.722  },
+  ]},
+  { id:'as', label:'Asia & Oceania', cities:[
+    { name:'Melbourne', country:'Australia', tz:'Australia/Melbourne', lat:-37.814, lon:144.963 },
+    { name:'Mumbai',    country:'India',     tz:'Asia/Kolkata',        lat:19.076,  lon:72.877  },
+    { name:'Shanghai',  country:'China',     tz:'Asia/Shanghai',       lat:31.228,  lon:121.474 },
+    { name:'Sydney',    country:'Australia', tz:'Australia/Sydney',    lat:-33.868, lon:151.209 },
+  ]},
+];
+const SEOUL = { name:'Seoul', country:'South Korea', tz:'Asia/Seoul', lat:37.566, lon:126.978 };
+const RCOLOR = { am:'#5b9cf6', eu:'#9d7cf5', me:'#f5a541', as:'#3ecfaa', kr:'#f06292' };
+
+// Search DB
+const CDB = {
+  'tokyo':{name:'Tokyo',country:'Japan',tz:'Asia/Tokyo',lat:35.683,lon:139.691},
+  'new york':{name:'New York',country:'USA',tz:'America/New_York',lat:40.713,lon:-74.006},
+  'london':{name:'London',country:'UK',tz:'Europe/London',lat:51.507,lon:-0.128},
+  'singapore':{name:'Singapore',country:'Singapore',tz:'Asia/Singapore',lat:1.352,lon:103.820},
+  'hong kong':{name:'Hong Kong',country:'China',tz:'Asia/Hong_Kong',lat:22.320,lon:114.170},
+  'bangkok':{name:'Bangkok',country:'Thailand',tz:'Asia/Bangkok',lat:13.756,lon:100.502},
+  'cairo':{name:'Cairo',country:'Egypt',tz:'Africa/Cairo',lat:30.033,lon:31.233},
+  'são paulo':{name:'São Paulo',country:'Brazil',tz:'America/Sao_Paulo',lat:-23.549,lon:-46.633},
+  'sao paulo':{name:'São Paulo',country:'Brazil',tz:'America/Sao_Paulo',lat:-23.549,lon:-46.633},
+  'paris':{name:'Paris',country:'France',tz:'Europe/Paris',lat:48.857,lon:2.352},
+  'berlin':{name:'Berlin',country:'Germany',tz:'Europe/Berlin',lat:52.524,lon:13.405},
+  'amsterdam':{name:'Amsterdam',country:'Netherlands',tz:'Europe/Amsterdam',lat:52.374,lon:4.890},
+  'frankfurt':{name:'Frankfurt',country:'Germany',tz:'Europe/Berlin',lat:50.110,lon:8.682},
+  'rome':{name:'Rome',country:'Italy',tz:'Europe/Rome',lat:41.902,lon:12.496},
+  'madrid':{name:'Madrid',country:'Spain',tz:'Europe/Madrid',lat:40.417,lon:-3.703},
+  'zurich':{name:'Zurich',country:'Switzerland',tz:'Europe/Zurich',lat:47.376,lon:8.540},
+  'vienna':{name:'Vienna',country:'Austria',tz:'Europe/Vienna',lat:48.208,lon:16.373},
+  'warsaw':{name:'Warsaw',country:'Poland',tz:'Europe/Warsaw',lat:52.231,lon:21.012},
+  'nairobi':{name:'Nairobi',country:'Kenya',tz:'Africa/Nairobi',lat:-1.292,lon:36.822},
+  'johannesburg':{name:'Johannesburg',country:'South Africa',tz:'Africa/Johannesburg',lat:-26.204,lon:28.047},
+  'lagos':{name:'Lagos',country:'Nigeria',tz:'Africa/Lagos',lat:6.524,lon:3.379},
+  'tehran':{name:'Tehran',country:'Iran',tz:'Asia/Tehran',lat:35.694,lon:51.421},
+  'karachi':{name:'Karachi',country:'Pakistan',tz:'Asia/Karachi',lat:24.861,lon:67.011},
+  'delhi':{name:'Delhi',country:'India',tz:'Asia/Kolkata',lat:28.614,lon:77.209},
+  'bangalore':{name:'Bangalore',country:'India',tz:'Asia/Kolkata',lat:12.971,lon:77.594},
+  'dhaka':{name:'Dhaka',country:'Bangladesh',tz:'Asia/Dhaka',lat:23.724,lon:90.409},
+  'kuala lumpur':{name:'Kuala Lumpur',country:'Malaysia',tz:'Asia/Kuala_Lumpur',lat:3.148,lon:101.694},
+  'jakarta':{name:'Jakarta',country:'Indonesia',tz:'Asia/Jakarta',lat:-6.214,lon:106.845},
+  'manila':{name:'Manila',country:'Philippines',tz:'Asia/Manila',lat:14.599,lon:120.984},
+  'taipei':{name:'Taipei',country:'Taiwan',tz:'Asia/Taipei',lat:25.047,lon:121.564},
+  'beijing':{name:'Beijing',country:'China',tz:'Asia/Shanghai',lat:39.907,lon:116.391},
+  'osaka':{name:'Osaka',country:'Japan',tz:'Asia/Tokyo',lat:34.694,lon:135.502},
+  'auckland':{name:'Auckland',country:'New Zealand',tz:'Pacific/Auckland',lat:-36.867,lon:174.770},
+  'toronto':{name:'Toronto',country:'Canada',tz:'America/Toronto',lat:43.651,lon:-79.383},
+  'chicago':{name:'Chicago',country:'USA',tz:'America/Chicago',lat:41.878,lon:-87.630},
+  'miami':{name:'Miami',country:'USA',tz:'America/New_York',lat:25.774,lon:-80.194},
+  'mexico city':{name:'Mexico City',country:'Mexico',tz:'America/Mexico_City',lat:19.433,lon:-99.133},
+  'buenos aires':{name:'Buenos Aires',country:'Argentina',tz:'America/Argentina/Buenos_Aires',lat:-34.613,lon:-58.377},
+  'seoul':{name:'Seoul',country:'South Korea',tz:'Asia/Seoul',lat:37.566,lon:126.978},
+};
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let calcOff = 0;
+let searched = [];
+let hoverCity = null;
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+const getNow = () => new Date(Date.now() + calcOff);
+
+// Equirectangular: viewBox 2000×1001
+function llToXY(lat, lon) {
+  return { x: (lon + 180) / 360 * 2000, y: (90 - lat) / 180 * 1001 };
+}
+
+const fmtT  = (d,tz) => d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+const fmtTS = (d,tz) => d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false});
+const fmtD  = (d,tz) => d.toLocaleDateString('en-GB',{timeZone:tz,weekday:'short',month:'short',day:'numeric'});
+function isWork(d,tz) {
+  const p = d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).split(':');
+  const t = +p[0]*60 + +p[1]; return t >= 540 && t < 1080;
+}
+function getOff(tz) {
+  const n=new Date(), a=new Date(n.toLocaleString('en-US',{timeZone:tz})), b=new Date(n.toLocaleString('en-US',{timeZone:'Asia/Seoul'}));
+  const d=Math.round((a-b)/3600000); return d>=0?`+${d}h`:`${d}h`;
+}
+
+// ── BUILD MAP PINS ────────────────────────────────────────────────────────────
+function buildPins() {
+  const g = document.getElementById('pinsG');
+  g.innerHTML = '';
+  const all = [];
+  REGIONS.forEach(r => r.cities.forEach(c => all.push({...c, rid:r.id})));
+  all.push({...SEOUL, rid:'kr'});
+
+  all.forEach(city => {
+    const {x,y} = llToXY(city.lat, city.lon);
+    const col = RCOLOR[city.rid];
+    const grp = document.createElementNS('http://www.w3.org/2000/svg','g');
+    grp.setAttribute('style','cursor:pointer');
+
+    // Outer glow ring
+    const ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    ring.setAttribute('cx',x.toFixed(2)); ring.setAttribute('cy',y.toFixed(2)); ring.setAttribute('r','7');
+    ring.setAttribute('fill','none'); ring.setAttribute('stroke',col); ring.setAttribute('stroke-width','1.4'); ring.setAttribute('opacity','0.4');
+
+    // Inner dot
+    const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('cx',x.toFixed(2)); dot.setAttribute('cy',y.toFixed(2)); dot.setAttribute('r','3.5');
+    dot.setAttribute('fill',col);
+
+    // Label (very small, offset)
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x',(x+5).toFixed(2)); lbl.setAttribute('y',(y-5).toFixed(2));
+    lbl.setAttribute('font-family','Syne,sans-serif'); lbl.setAttribute('font-size','10');
+    lbl.setAttribute('font-weight','600'); lbl.setAttribute('fill',col);
+    lbl.setAttribute('opacity','0.7'); lbl.setAttribute('pointer-events','none');
+    lbl.setAttribute('style','user-select:none');
+    lbl.textContent = city.name.split(' ')[0].split('(')[0];
+
+    grp.appendChild(ring); grp.appendChild(dot); grp.appendChild(lbl);
+    grp.addEventListener('mouseenter', e => showMTT(e, city));
+    grp.addEventListener('mouseleave', hideMTT);
+    g.appendChild(grp);
+  });
+}
+
+// ── MAP TOOLTIP ───────────────────────────────────────────────────────────────
+function showMTT(e, city) {
+  hoverCity = city;
+  refreshMTT();
+  positionMTT(city);
+  document.getElementById('mtt').classList.add('show');
+}
+function hideMTT() {
+  hoverCity = null;
+  document.getElementById('mtt').classList.remove('show');
+}
+function refreshMTT() {
+  if(!hoverCity) return;
+  const now = getNow();
+  document.getElementById('mttCity').textContent = hoverCity.name;
+  document.getElementById('mttCountry').textContent = hoverCity.country;
+  document.getElementById('mttTime').textContent = fmtT(now, hoverCity.tz);
+  document.getElementById('mttDate').textContent = fmtD(now, hoverCity.tz);
+  const w = isWork(now, hoverCity.tz);
+  const s = document.getElementById('mttStatus');
+  s.className = `mtt-status ${w?'on':'off'}`;
+  document.getElementById('mttLbl').textContent = w ? 'OPEN' : 'OFF';
+}
+function positionMTT(city) {
+  const svg = document.getElementById('worldSvg');
+  const sr = svg.getBoundingClientRect();
+  const wr = document.getElementById('mapWrap').getBoundingClientRect();
+  const {x,y} = llToXY(city.lat, city.lon);
+  const sx = sr.width / 2000, sy = sr.height / 1001;
+  let tx = sr.left - wr.left + x*sx + 10;
+  let ty = sr.top  - wr.top  + y*sy - 32;
+  const tt = document.getElementById('mtt');
+  if(tx + 160 > wr.width)  tx -= 170;
+  if(ty < 4) ty = y*sy + 12;
+  tt.style.left = tx + 'px';
+  tt.style.top  = ty + 'px';
+}
+
+// ── BUILD REGION CARDS ────────────────────────────────────────────────────────
+function buildRegions() {
+  const el = document.getElementById('regionsEl');
+  el.innerHTML = '';
+  REGIONS.forEach((r, ri) => {
+    const wrap = document.createElement('div');
+    wrap.className = `region-wrap region region-${r.id}`;
+    wrap.innerHTML = `
+      <div class="region-hdr">
+        <div class="rh-line"></div>
+        <div class="rh-pill"><div class="rh-dot"></div>${r.label}</div>
+        <span class="rh-count">${r.cities.length} cities</span>
+        <div class="rh-line"></div>
+      </div>`;
+    const grid = document.createElement('div');
+    grid.className = 'city-grid';
+    r.cities.forEach((c, ci) => {
+      const card = document.createElement('div');
+      card.className = 'city-card';
+      card.style.animationDelay = `${(ri*6+ci)*0.04}s`;
+      card.innerHTML = `
+        <div class="cc-top">
+          <div><div class="cc-name">${c.name}</div><div class="cc-country">${c.country}</div></div>
+          <div class="w-pill off" id="wp-${r.id}-${ci}"><div class="wd"></div><span id="wl-${r.id}-${ci}">OFF</span></div>
+        </div>
+        <div class="cc-time" id="ct-${r.id}-${ci}">--:--:--</div>
+        <div class="cc-date" id="cd-${r.id}-${ci}">---</div>
+        <div class="cc-off">${getOff(c.tz)} vs Seoul</div>`;
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+    el.appendChild(wrap);
+  });
+}
+
+// ── MASTER UPDATE ─────────────────────────────────────────────────────────────
+function tick() {
+  const now = getNow();
+  const tz  = 'Asia/Seoul';
+
+  // Header
+  document.getElementById('hdrT').textContent = fmtT(now, tz);
+  document.getElementById('hdrD').textContent = fmtD(now, tz);
+
+  // Seoul card
+  document.getElementById('scTime').textContent = fmtT(now, tz);
+  document.getElementById('scDate').textContent = fmtD(now, tz);
+  const sw = isWork(now, tz);
+  const sb = document.getElementById('scBadge');
+  sb.className = `sc-badge ${sw?'on':'off'}`;
+  document.getElementById('scLbl').textContent = sw ? 'OPEN' : 'OFF';
+
+  // Region cards
+  REGIONS.forEach(r => r.cities.forEach((c,ci) => {
+    const tEl = document.getElementById(`ct-${r.id}-${ci}`);
+    const dEl = document.getElementById(`cd-${r.id}-${ci}`);
+    const wEl = document.getElementById(`wp-${r.id}-${ci}`);
+    const wlEl = document.getElementById(`wl-${r.id}-${ci}`);
+    if(!tEl) return;
+    tEl.textContent = fmtT(now, c.tz);
+    dEl.textContent = fmtD(now, c.tz);
+    const w = isWork(now, c.tz);
+    wEl.className = `w-pill ${w?'on':'off'}`;
+    wlEl.textContent = w ? 'OPEN' : 'OFF';
+  }));
+
+  // Search items
+  updateSearchItems();
+  // Tooltip
+  refreshMTT();
+}
+
+// ── SEARCH ───────────────────────────────────────────────────────────────────
+function qs(n) { document.getElementById('sIn').value = n; doSearch(); }
+function doSearch() {
+  const raw = document.getElementById('sIn').value.trim();
+  if(!raw) return;
+  const q = raw.toLowerCase();
+  let found = CDB[q];
+  if(!found) {
+    const k = Object.keys(CDB).find(k => k.includes(q) || q.includes(k));
+    if(k) found = CDB[k];
+  }
+  if(!found) {
+    document.getElementById('sList').innerHTML =
+      `<div class="s-empty">😕 <strong style="color:var(--body)">"${raw}"</strong> 를 찾을 수 없습니다<br><span style="font-size:10px;color:var(--dim)">Try: Tokyo, London, Paris, New York…</span></div>`;
+    return;
+  }
+  if(!searched.find(c => c.tz===found.tz && c.name===found.name)) {
+    searched.unshift(found);
+    if(searched.length > 8) searched.pop();
+  }
+  document.getElementById('sIn').value = '';
+  renderSearch();
+}
+function renderSearch() {
+  const el = document.getElementById('sList');
+  if(!searched.length) { el.innerHTML='<div class="s-empty">검색한 도시의 현재 시간이<br>여기에 표시됩니다</div>'; return; }
+  el.innerHTML = '';
+  searched.forEach((c,i) => {
+    const item = document.createElement('div');
+    item.className = 's-item';
+    item.style.animationDelay = `${i*0.04}s`;
+    item.innerHTML = `
+      <div class="si-info">
+        <div class="si-city">${c.name}</div>
+        <div class="si-country">${c.country}</div>
+      </div>
+      <div class="si-right">
+        <div class="si-time" id="sit-${i}">--:--</div>
+        <div class="si-date" id="sid-${i}">---</div>
+        <div class="si-badge off" id="sib-${i}">● OFF</div>
+      </div>
+      <button class="si-rm" onclick="rmSearch(${i})">×</button>`;
+    el.appendChild(item);
+  });
+  updateSearchItems();
+}
+function updateSearchItems() {
+  const now = getNow();
+  searched.forEach((c,i) => {
+    const t=document.getElementById(`sit-${i}`), d=document.getElementById(`sid-${i}`), b=document.getElementById(`sib-${i}`);
+    if(!t) return;
+    t.textContent = fmtTS(now, c.tz);
+    d.textContent = fmtD(now, c.tz);
+    const w = isWork(now, c.tz);
+    b.textContent = w?'● OPEN':'● OFF';
+    b.className = `si-badge ${w?'on':'off'}`;
+  });
+}
+function rmSearch(i) { searched.splice(i,1); renderSearch(); }
+
+// ── CALCULATOR ────────────────────────────────────────────────────────────────
+function applyCalc() {
+  const v = document.getElementById('calcIn').value; if(!v) return;
+  const [hh,mm] = v.split(':').map(Number);
+  const n = new Date(), sn = new Date(n.toLocaleString('en-US',{timeZone:'Asia/Seoul'}));
+  const tgt = new Date(sn); tgt.setHours(hh,mm,0,0);
+  calcOff = tgt - sn;
+  document.getElementById('prevPill').classList.add('on');
+  tick();
+}
+function resetCalc() {
+  calcOff = 0;
+  document.getElementById('calcIn').value = '';
+  document.getElementById('prevPill').classList.remove('on');
+  tick();
+}
+document.getElementById('calcIn').addEventListener('keydown', e => { if(e.key==='Enter') applyCalc(); });
+document.getElementById('sIn').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+buildRegions();
+buildPins();
+tick();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
