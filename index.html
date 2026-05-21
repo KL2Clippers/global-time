@@ -8,14 +8,19 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0b0d14;--card:#111420;--card2:#171b28;
+  --bg:#0b0d14;--card:#111420;--card2:#171b28;--card3:#1c2030;
   --rim:rgba(255,255,255,0.065);--rim2:rgba(255,255,255,0.12);
   --dim:#374057;--muted:#5d6b88;--sub:#8a96b2;--body:#c4cad8;--hi:#edf0f8;
   --c1:#5b9cf6;--c2:#9d7cf5;--c3:#f5a541;--c4:#3ecfaa;--c5:#f06292;
   --go:#2ecc71;--go2:rgba(46,204,113,0.14);--go3:rgba(46,204,113,0.32);
 }
+html{font-size:15px}
 body{background:var(--bg);color:var(--body);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
-.wrap{max-width:1500px;margin:0 auto;padding:0 26px 90px;position:relative;z-index:1}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.022) 1px,transparent 1px);background-size:30px 30px;pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 1000px 600px at 8% 12%,rgba(91,156,246,.05),transparent 65%),radial-gradient(ellipse 700px 500px at 92% 85%,rgba(62,207,170,.04),transparent 65%);pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:1500px;margin:0 auto;padding:0 26px 90px}
+
+/* HEADER */
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 0 20px;border-bottom:1px solid var(--rim);flex-wrap:wrap;gap:14px}
 .hdr-l{display:flex;align-items:center;gap:12px}
 .logo{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--c1),var(--c4));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#000;flex-shrink:0}
@@ -26,35 +31,47 @@ body{background:var(--bg);color:var(--body);font-family:'Syne',sans-serif;min-he
 .hdr-tag{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
 .hdr-time{font-family:'JetBrains Mono',monospace;font-size:23px;color:var(--c4);letter-spacing:.02em;line-height:1}
 .hdr-date{font-size:10px;color:var(--muted);margin-top:3px;font-family:'JetBrains Mono',monospace;letter-spacing:.05em}
-.pulse{width:8px;height:8px;border-radius:50%;background:var(--go);animation:pulse 2.5s ease-in-out infinite}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--go);box-shadow:0 0 0 3px var(--go2);animation:pulse 2.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 3px var(--go2)}50%{box-shadow:0 0 0 6px rgba(46,204,113,.07)}}
+
+/* LAYOUT */
 .main{display:grid;grid-template-columns:1fr 340px;gap:14px;margin-top:18px}
+
+/* PANELS */
 .panel{background:var(--card);border:1px solid var(--rim);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden}
 .panel-line{position:absolute;top:0;left:0;right:0;height:1px}
 .p-hdr{display:flex;align-items:center;gap:7px;margin-bottom:13px}
 .p-title{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
 .p-sub{font-size:9px;color:var(--dim);letter-spacing:.05em}
+
+/* MAP */
 .map-panel .panel-line{background:linear-gradient(90deg,transparent,var(--c4) 35%,var(--c1) 65%,transparent);opacity:.4}
 #mapBox{position:relative}
 #wmap{width:100%;height:auto;display:block;border-radius:6px}
-.tt{position:absolute;background:rgba(10,12,20,.97);border:1px solid var(--rim2);border-radius:10px;padding:10px 14px;pointer-events:none;opacity:0;transition:opacity .12s;z-index:40;min-width:145px}
+
+/* Tooltip */
+.tt{position:absolute;background:rgba(10,12,20,.97);border:1px solid var(--rim2);border-radius:10px;padding:10px 14px;pointer-events:none;opacity:0;transition:opacity .12s;z-index:40;min-width:145px;backdrop-filter:blur(10px)}
 .tt.on{opacity:1}
 .tt-city{font-size:13px;font-weight:700;color:var(--hi)}
-.tt-ctry{font-size:9px;color:var(--muted);margin-top:1px}
-.tt-time{font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--c4);margin-top:6px}
+.tt-ctry{font-size:9px;color:var(--muted);margin-top:1px;letter-spacing:.04em}
+.tt-time{font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--c4);margin-top:6px;letter-spacing:.02em}
 .tt-date{font-size:9px;color:var(--muted);margin-top:2px;font-family:'JetBrains Mono',monospace}
 .tt-status{display:inline-flex;align-items:center;gap:4px;margin-top:7px;padding:2px 8px;border-radius:20px;border:1px solid;font-size:8px;font-weight:700;letter-spacing:.12em}
 .tt-status.on{color:var(--go);border-color:var(--go3);background:var(--go2)}
 .tt-status.off{color:var(--dim);border-color:var(--rim)}
 .tt-dot{width:4px;height:4px;border-radius:50%}
-.tt-status.on .tt-dot{background:var(--go)}
+.tt-status.on .tt-dot{background:var(--go);animation:pulse 2s infinite}
 .tt-status.off .tt-dot{background:var(--dim)}
+
+/* RIGHT COL */
 .right{display:flex;flex-direction:column;gap:12px}
+
+/* SEOUL Base */
 .seoul-panel{background:var(--card);border:1px solid rgba(240,98,146,.2);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden}
 .seoul-panel .panel-line{background:linear-gradient(90deg,transparent,var(--c5),transparent);opacity:.6}
 .s-tag{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--c5);opacity:.85}
 .s-flag{font-size:24px;margin:7px 0 5px}
-.s-city{font-size:19px;font-weight:800;color:var(--hi)}
+.s-city{font-size:19px;font-weight:800;color:var(--hi);letter-spacing:-.01em}
 .s-sub{font-size:9px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);margin-top:2px;margin-bottom:12px}
 .s-time{font-family:'JetBrains Mono',monospace;font-size:38px;font-weight:400;color:#fff;letter-spacing:-.03em;line-height:1}
 .s-date{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:6px;letter-spacing:.05em}
@@ -62,43 +79,50 @@ body{background:var(--bg);color:var(--body);font-family:'Syne',sans-serif;min-he
 .s-badge.on{color:var(--go);border-color:var(--go3);background:var(--go2)}
 .s-badge.off{color:var(--dim);border-color:var(--rim)}
 .sdot{width:4px;height:4px;border-radius:50%}
+
+/* SEARCH PANEL */
 .search-panel .panel-line{background:linear-gradient(90deg,transparent,var(--c3),transparent);opacity:.4}
 .s-row{display:flex;gap:7px;margin-bottom:9px}
-.s-inp{flex:1;background:var(--card2);border:1px solid var(--rim);border-radius:8px;color:var(--hi);font-family:'Syne',sans-serif;font-size:13px;padding:8px 11px;outline:none}
-.s-inp:focus{border-color:var(--c3)}
+.s-inp{flex:1;background:var(--card2);border:1px solid var(--rim);border-radius:8px;color:var(--hi);font-family:'Syne',sans-serif;font-size:13px;padding:8px 11px;outline:none;transition:border-color .15s,box-shadow .15s}
+.s-inp:focus{border-color:var(--c3);box-shadow:0 0 0 3px rgba(245,165,65,.09)}
 .s-inp::placeholder{color:var(--dim)}
-.s-btn{background:var(--c3);border:none;border-radius:8px;color:#000;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:8px 13px;cursor:pointer;white-space:nowrap}
+.s-btn{background:var(--c3);border:none;border-radius:8px;color:#000;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.09em;padding:8px 13px;cursor:pointer;transition:opacity .15s,transform .12s;white-space:nowrap}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px}
-.chip{background:var(--card2);border:1px solid var(--rim);border-radius:5px;padding:3px 8px;font-size:9px;color:var(--muted);cursor:pointer;font-weight:600}
+.chip{background:var(--card2);border:1px solid var(--rim);border-radius:5px;padding:3px 8px;font-size:9px;color:var(--muted);cursor:pointer;transition:all .13s;letter-spacing:.04em;font-weight:600}
 .chip:hover{border-color:var(--c3);color:var(--c3)}
-.r-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto}
-.r-item{background:var(--card2);border:1px solid var(--rim);border-radius:8px;padding:9px 11px;display:flex;align-items:center;gap:8px}
+.r-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;}
+.r-item{background:var(--card2);border:1px solid var(--rim);border-radius:8px;padding:9px 11px;display:flex;align-items:center;gap:8px;animation:fadeup .2s ease both}
+@keyframes fadeup{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .ri-info{flex:1;min-width:0}
 .ri-city{font-size:12px;font-weight:700;color:var(--hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ri-ctry{font-size:9px;color:var(--muted);margin-top:2px}
+.ri-ctry{font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:.04em}
 .ri-r{text-align:right;flex-shrink:0}
 .ri-time{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--c4)}
 .ri-date{font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px}
-.ri-badge{display:inline-flex;align-items:center;gap:3px;margin-top:3px;padding:2px 6px;border-radius:20px;border:1px solid;font-size:7px;font-weight:700}
+.ri-badge{display:inline-flex;align-items:center;gap:3px;margin-top:3px;padding:2px 6px;border-radius:20px;border:1px solid;font-size:7px;font-weight:700;}
 .ri-badge.on{color:var(--go);border-color:var(--go3);background:var(--go2)}
 .ri-badge.off{color:var(--dim);border-color:var(--rim)}
 .ri-rm{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:2px;flex-shrink:0}
 .ri-rm:hover{color:#ef4444}
 .r-empty{font-size:11px;color:var(--dim);text-align:center;padding:18px 0;line-height:1.8}
-.calc-container{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:13px}
+
+/* CALC BAR SYSTEM */
+.calc-container { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 13px; }
 .calc{background:var(--card);border:1px solid var(--rim);border-radius:14px;padding:16px 20px;position:relative;overflow:hidden}
 .calc .panel-line{background:linear-gradient(90deg,transparent,var(--c1),var(--c4),transparent);opacity:.4}
 .calc-inner{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .calc-lbl{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
-.calc-inp{background:var(--card2);border:1px solid var(--rim);border-radius:7px;color:var(--hi);font-family:'JetBrains Mono',monospace;font-size:14px;padding:7px 12px;outline:none;width:120px}
-.calc-inp:focus{border-color:var(--c4)}
-.calc-select{background:var(--card2);border:1px solid var(--rim);border-radius:7px;color:var(--hi);font-family:'Syne',sans-serif;font-size:13px;padding:7px 10px;outline:none;width:170px}
-.calc-go{background:linear-gradient(135deg,var(--c1),var(--c4));border:none;border-radius:7px;color:#000;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:8px 14px;cursor:pointer}
-.calc-rst{background:transparent;border:1px solid var(--rim);border-radius:7px;color:var(--muted);font-family:'Syne',sans-serif;font-size:11px;font-weight:600;padding:7px 12px;cursor:pointer}
+.calc-inp{background:var(--card2);border:1px solid var(--rim);border-radius:7px;color:var(--hi);font-family:'JetBrains Mono',monospace;font-size:14px;padding:7px 12px;outline:none;width:120px;transition:border-color .15s,box-shadow .15s}
+.calc-inp:focus{border-color:var(--c4);box-shadow:0 0 0 3px rgba(62,207,170,.09)}
+.calc-select{background:var(--card2);border:1px solid var(--rim);border-radius:7px;color:var(--hi);font-family:'Syne',sans-serif;font-size:13px;padding:7px 10px;outline:none;width:170px;}
+.calc-go{background:linear-gradient(135deg,var(--c1),var(--c4));border:none;border-radius:7px;color:#000;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:8px 14px;cursor:pointer;}
+.calc-rst{background:transparent;border:1px solid var(--rim);border-radius:7px;color:var(--muted);font-family:'Syne',sans-serif;font-size:11px;font-weight:600;padding:7px 12px;cursor:pointer;}
 .calc-rst:hover{border-color:var(--sub);color:var(--hi)}
-.prev-pill{display:none;align-items:center;gap:5px;background:rgba(245,165,65,.1);border:1px solid rgba(245,165,65,.28);border-radius:6px;padding:3px 9px;font-size:9px;font-weight:700;color:var(--c3)}
+.prev-pill{display:none;align-items:center;gap:5px;background:rgba(245,165,65,.1);border:1px solid rgba(245,165,65,.28);border-radius:6px;padding:3px 9px;font-size:9px;font-weight:700;color:var(--c3);}
 .prev-pill.on{display:flex}
-.result-display{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--c3);font-weight:600;margin-left:auto}
+.result-display { font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--c3); font-weight: 600; margin-left: auto; }
+
+/* REGIONS */
 .regions{margin-top:20px;display:flex;flex-direction:column;gap:26px}
 .rg-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .rg-line{flex:1;height:1px;background:var(--rim)}
@@ -114,9 +138,9 @@ body{background:var(--bg);color:var(--body);font-family:'Syne',sans-serif;min-he
 .region-as .rg-tag{color:var(--c4);border-color:rgba(62,207,170,.25);background:rgba(62,207,170,.06)}
 .region-as .rg-dot{background:var(--c4)}
 .city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:8px}
-.c-card{background:var(--card);border:1px solid var(--rim);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;transition:0.2s}
+.c-card{background:var(--card);border:1px solid var(--rim);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;transition:0.2s;animation:fadeup .35s ease both}
 .c-card:hover { background:var(--card2); border-color:var(--rim2); transform:translateY(-2px); }
-.c-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0}
+.c-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;}
 .c-card:hover::after{opacity:1}
 .region-am .c-card::after{background:linear-gradient(90deg,transparent,var(--c1),transparent)}
 .region-eu .c-card::after{background:linear-gradient(90deg,transparent,var(--c2),transparent)}
@@ -129,12 +153,13 @@ body{background:var(--bg);color:var(--body);font-family:'Syne',sans-serif;min-he
 .w-tag.on{color:var(--go);border-color:var(--go3);background:var(--go2)}
 .w-tag.off{color:var(--dim);border-color:var(--rim)}
 .wd{width:4px;height:4px;border-radius:50%}
-.cc-time{font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--body);line-height:1;margin-bottom:4px}
+.cc-time{font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--body);line-height:1;margin-bottom:4px;}
 .c-card:hover .cc-time{color:#fff}
-.cc-date{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted)}
-.cc-off{font-size:8px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-top:5px}
+.cc-date{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);}
+.cc-off{font-size:8px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-top:5px;}
+
 footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--rim);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.ft{font-size:10px;color:var(--dim)}
+.ft{font-size:10px;color:var(--dim);}
 </style>
 </head>
 <body>
@@ -159,6 +184,7 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--rim);display:
 </header>
 
 <div class="main">
+
   <div class="panel map-panel">
     <div class="panel-line"></div>
     <div class="p-hdr">
@@ -166,50 +192,48 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--rim);display:
       <span class="p-title">Live City Map</span>
       <span class="p-sub">— hover pins for live time</span>
     </div>
-    <div id="mapBox" style="position:relative">
-      <svg id="wmap" viewBox="0 0 1009 665" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;border-radius:6px">
-        <rect width="1009" height="665" fill="#0e1525" rx="6"/>
+    <div id="mapBox">
+      <svg id="wmap" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="og" cx="50%" cy="40%" r="65%">
+            <stop offset="0%" stop-color="#0e1525"/>
+            <stop offset="100%" stop-color="#080c16"/>
+          </radialGradient>
+        </defs>
+        <rect width="1000" height="500" fill="url(#og)" rx="6"/>
         <g stroke="rgba(255,255,255,0.04)" stroke-width="0.5" fill="none">
-          <line x1="0" y1="110" x2="1009" y2="110"/>
-          <line x1="0" y1="221" x2="1009" y2="221"/>
-          <line x1="0" y1="332" x2="1009" y2="332"/>
-          <line x1="0" y1="443" x2="1009" y2="443"/>
-          <line x1="0" y1="554" x2="1009" y2="554"/>
-          <line x1="168" y1="0" x2="168" y2="665"/>
-          <line x1="336" y1="0" x2="336" y2="665"/>
-          <line x1="504" y1="0" x2="504" y2="665"/>
-          <line x1="672" y1="0" x2="672" y2="665"/>
-          <line x1="840" y1="0" x2="840" y2="665"/>
+          <line x1="0" y1="83.3"  x2="1000" y2="83.3"/>
+          <line x1="0" y1="166.7" x2="1000" y2="166.7"/>
+          <line x1="0" y1="333.3" x2="1000" y2="333.3"/>
+          <line x1="0" y1="416.7" x2="1000" y2="416.7"/>
+          <line x1="166.7" y1="0" x2="166.7" y2="500"/>
+          <line x1="333.3" y1="0" x2="333.3" y2="500"/>
+          <line x1="500"   y1="0" x2="500"   y2="500"/>
+          <line x1="666.7" y1="0" x2="666.7" y2="500"/>
+          <line x1="833.3" y1="0" x2="833.3" y2="500"/>
         </g>
-        <line x1="0" y1="332" x2="1009" y2="332" stroke="rgba(62,207,170,0.12)" stroke-width="1" stroke-dasharray="5,8"/>
+        <line x1="0" y1="250" x2="1000" y2="250" stroke="rgba(62,207,170,0.13)" stroke-width="0.9" stroke-dasharray="5,8"/>
 
-        <g fill="#1a2035" stroke="rgba(255,255,255,0.07)" stroke-width="0.6">
-          <path d="M80,85 L95,78 L112,72 L130,68 L148,65 L162,68 L170,75 L165,85 L155,92 L148,100 L140,108 L130,115 L125,108 L118,102 L108,98 L95,95 L82,92 Z"/>
-          <path d="M148,65 L170,58 L195,52 L218,50 L238,52 L252,58 L258,68 L252,78 L240,85 L228,90 L215,95 L200,100 L188,108 L178,115 L170,122 L162,130 L155,140 L148,148 L140,155 L132,162 L125,170 L118,178 L112,185 L108,195 L105,205 L102,215 L100,228 L98,242 L95,255 L92,265 L88,272 L85,278 L80,282 L78,290 L82,298 L88,305 L95,308 L102,305 L108,298 L115,290 L120,282 L125,275 L132,268 L138,262 L145,258 L152,255 L158,252 L165,250 L172,248 L178,248 L185,250 L190,255 L195,262 L198,270 L200,280 L202,290 L200,298 L195,305 L188,310 L182,315 L178,322 L175,330 L172,340 L170,350 L168,358 L165,362 L162,360 L158,355 L155,348 L152,340 L148,332 L145,325 L142,318 L138,312 L132,308 L125,305 L118,305 L112,308 L108,312 L105,318 L102,325 L100,332 L98,340 L95,348 L92,355 L88,362 L85,368 L82,372 L78,375 L75,378 L70,378 L65,375 L62,370 L60,362 L60,352 L62,342 L65,332 L68,322 L70,312 L72,302 L72,292 L70,282 L68,272 L65,262 L62,252 L60,242 L58,232 L58,222 L60,212 L62,202 L65,192 L68,182 L72,172 L75,162 L78,152 L80,142 L82,132 L82,122 L80,112 L78,102 L78,92 L80,85 Z"/>
-          <path d="M218,28 L240,22 L262,20 L278,22 L288,30 L292,40 L288,50 L278,58 L262,62 L248,62 L235,58 L225,50 L218,42 Z"/>
-          <path d="M155,295 L162,290 L168,285 L175,282 L180,285 L182,292 L178,300 L172,305 L165,308 L158,305 Z"/>
-          <path d="M195,295 L205,285 L218,278 L230,272 L242,268 L255,265 L265,268 L272,275 L278,285 L282,298 L285,312 L285,328 L282,345 L278,360 L272,375 L265,390 L258,405 L250,418 L242,430 L235,442 L228,452 L220,460 L212,468 L205,472 L200,470 L195,462 L190,452 L185,440 L182,428 L180,415 L178,402 L178,388 L180,375 L182,362 L185,350 L185,338 L183,328 L180,318 L178,308 L178,298 L180,290 L185,285 L192,285 Z"/>
-          <path d="M430,52 L448,45 L465,42 L480,42 L492,48 L500,55 L505,65 L505,75 L500,85 L492,92 L482,98 L472,102 L462,105 L452,108 L442,110 L432,110 L422,108 L415,102 L410,95 L410,85 L415,75 L422,65 Z"/>
-          <path d="M455,108 L465,105 L478,102 L490,100 L502,100 L515,102 L528,108 L538,115 L545,122 L548,132 L545,142 L538,150 L528,155 L518,158 L508,158 L498,155 L488,150 L480,142 L475,132 L472,122 L465,115 Z"/>
-          <path d="M495,55 L510,48 L525,45 L542,45 L558,48 L572,55 L582,65 L585,78 L582,90 L572,100 L560,108 L548,112 L535,115 L522,115 L510,112 L500,108 L492,100 L488,90 L488,78 L492,68 Z"/>
-          <path d="M540,108 L552,105 L562,102 L572,105 L580,112 L582,122 L578,132 L568,140 L555,145 L542,145 L530,140 L522,132 L520,122 L525,112 Z"/>
-          <path d="M448,148 L460,142 L472,138 L485,138 L498,142 L510,150 L520,160 L528,172 L532,185 L535,200 L535,215 L532,230 L528,245 L522,260 L515,275 L508,290 L500,305 L492,318 L485,332 L478,345 L472,358 L468,370 L465,382 L462,393 L462,402 L465,412 L468,420 L472,428 L472,435 L468,440 L462,442 L455,440 L448,435 L442,428 L438,420 L435,410 L432,400 L430,390 L428,378 L425,368 L422,358 L418,348 L415,338 Lif,328 L410,318 L408,308 L408,298 L410,288 L412,278 L415,268 L418,258 L422,248 L425,238 L428,228 L430,218 L432,208 L432,198 L430,188 L428,178 L428,168 L430,158 L435,150 L442,145 Z"/>
-          <path d="M545,342 L550,330 L555,322 L560,320 L565,322 L568,332 L568,345 L565,358 L560,368 L555,372 L550,368 L546,358 L544,348 Z"/>
-          <path d="M545,42 L572,35 L600,30 L630,28 L660,28 L690,30 L720,32 L748,35 L775,38 L800,40 L822,42 L840,45 L855,48 L865,52 L870,60 L868,70 L860,78 L848,85 L835,90 L820,95 L805,98 L790,100 L775,100 L760,98 L745,95 L730,90 L715,88 L700,88 L685,90 L670,95 L658,100 L645,105 L632,108 L620,110 L608,108 L598,105 L588,100 L580,95 L572,90 L562,85 L552,80 L544,75 L540,68 L540,58 Z"/>
-          <path d="M660,88 L690,85 L720,85 L748,88 L775,92 L800,98 L822,105 L840,112 L855,120 L865,130 L865,142 L862,152 L850,160 L835,165 L820,168 L805,168 L790,165 L775,158 L760,150 L748,140 L738,130 L728,122 L718,115 L708,110 L698,108 L688,108 L678,110 L668,115 L658,120 L648,125 L638,128 L628,130 L618,128 L608,122 L600,115 L595,105 L595,95 L600,88 L610,85 Z"/>
-          <path d="M535,148 L548,142 L560,140 L572,140 L582,145 L590,152 L595,162 L595,172 L590,182 L582,190 L572,195 L560,198 L548,198 L538,195 L530,188 L525,178 L525,168 L528,158 Z"/>
-          <path d="M590,152 L605,145 L620,142 L635,142 L648,148 L658,158 L662,170 L658,182 L648,192 L635,198 L620,202 L605,202 L592,198 L582,190 L578,178 L580,165 Z"/>
-          <path d="M658,158 L672,152 L685,150 L698,152 L710,158 L720,168 L725,180 L725,192 L720,205 L712,218 L702,228 L692,238 L682,245 L672,250 L662,252 L652,250 L645,245 L640,238 L638,228 L638,218 L640,208 L645,198 L650,188 L655,178 Z"/>
-          <path d="M768,155 L785,148 L800,145 L815,148 L828,158 L835,170 L835,182 L828,192 L815,198 L800,202 L785,200 L772,195 L762,185 L758,172 L762,160 Z"/>
-          <path d="M780,195 L795,192 L808,195 L818,202 L822,212 L820,222 L812,230 L800,235 Hug,235 L778,230 L772,222 L770,212 L774,202 Z"/>
-          <path d="M720,88 L748,85 L775,82 L800,82 L820,85 L835,92 L842,102 L842,115 L835,128 L822,138 L808,145 L792,150 L778,152 L762,150 L748,145 L735,138 L724,128 L715,118 L710,108 L710,98 L714,90 Z"/>
-          <path d="M838,112 L848,108 L858,108 L865,115 L865,125 L858,132 L848,135 L838,132 L832,125 L832,118 Z"/>
-          <path d="M872,105 L880,100 L888,100 L895,105 L898,115 L898,128 L895,138 L888,145 L880,148 L872,145 L866,138 L864,128 L866,115 Z"/>
-          <path d="M788,415 L808,408 L828,405 L850,405 L870,408 L888,415 L902,425 L910,438 L912,452 L910,465 L902,478 L890,490 L875,498 L858,502 L840,505 L822,505 L805,500 L788,492 L775,480 L765,468 L760,455 L760,440 L765,428 Z"/>
-          <path d="M928,488 L932,480 L938,478 L944,482 L944,492 L940,500 L934,502 L928,498 Z"/>
-          <path d="M935,510 L940,505 L946,505 L950,510 L950,520 L946,528 L940,530 L935,526 L932,518 Z"/>
-          <path d="M402,45 L408,40 L415,40 L420,45 L420,55 L415,62 L408,65 L402,62 L398,55 Z"/>
-          <path d="M430,92 L438,88 L446,88 L452,94 L452,102 L448,110 L440,114 L432,112 L426,106 L426,98 Z"/>
+        <g fill="#1d2438" stroke="rgba(255,255,255,0.08)" stroke-width="0.5">
+          <path d="M294.4,38.9 L372.2,19.4 L444.4,19.4 L450,38.9 L439,55.6 L378,83.3 L356,77.8 L344,61.1 L342,47.2 Z"/>
+          <path d="M108.3,83.3 L100,77.8 L86.1,72.2 L66.7,69.4 L41.7,77.8 L50,88.9 L55.6,97.2 L69.4,91.7 L77.8,86.1 L91.7,83.3 Z"/>
+          <path d="M108.3,52.8 L138.9,55.6 L138.9,61.1 L152.8,66.7 L152.8,77.8 L136.1,83.3 L130.6,94.4 L155.6,94.4 L155.6,116.7 L155.6,127.8 L155.6,138.9 L161.1,147.2 L166.7,155.6 L175,161.1 L194.4,169.4 L200,180.6 L205.6,188.9 L211.1,197.2 L244.4,205.6 L263.9,219.4 L286.1,225 L291.7,222.2 L300,216.7 L311.1,219.4 L313.9,202.8 L305.6,197.2 L294.4,194.4 L272.2,186.1 L275,180.6 L277.8,177.8 L275,166.7 L275,161.1 L291.7,152.8 L294.4,138.9 L305.6,133.3 L313.9,125 L311.1,119.4 L305.6,119.4 L300,113.9 L291.7,111.1 L277.8,105.6 L283.3,97.2 L283.3,88.9 L283.3,83.3 L272.2,75 L269.4,69.4 L250,61.1 L233.3,55.6 L219.4,52.8 Z"/>
+          <path d="M258.3,191.7 L250,202.8 L261.1,219.4 L280,224 L286.1,225 L291.7,222.2 L294.4,219.4 L311.1,219.4 L311.1,202.8 L305.6,197.2 L294.4,194.4 L266.7,186.1 Z"/>
+          <path d="M300,216.7 L325,219.4 L333.3,219.4 L333.3,227.8 L338.9,233.3 L361.1,244.4 L377.8,255.6 L402.8,263.9 L397.2,277.8 L391.7,294.4 L388.9,305.6 L380.6,316.7 L363.9,327.8 L352.8,341.7 L341.7,347.2 L341.7,355.6 L325,363.9 L319.4,372.2 L316.7,377.8 L305.6,394.4 L313.9,402.8 L322.2,400 L338.9,394.4 L355.6,380.6 L361.1,375 L361.1,333.3 L366.7,319.4 L380.6,311.1 L394.4,294.4 L402.8,252.8 L366.7,250 L355.6,244.4 L355.6,236.1 L333.3,227.8 L319.4,230.6 L311.1,236.1 L311.1,250 L297.2,261.1 L291.7,277.8 L288.9,291.7 L305.6,300 L311.1,316.7 L319.4,305.6 L325,297.2 L333.3,294.4 L355.6,283.3 L361.1,250 L347.2,233.3 Z"/>
+          <path d="M486.1,111.1 L494.4,108.3 L502.8,105.6 L500,102.8 L494.4,94.4 L488.9,88.9 L491.7,88.9 L483.3,94.4 L486.1,100 L491.7,102.8 L488.9,108.3 Z"/>
+          <path d="M475,130.6 L475,150 L483.3,150 L494.4,150 L508.3,144.4 L511.1,138.9 L511.1,130.6 L500,130.6 L494.4,127.8 L483.3,127.8 Z"/>
+          <path d="M505.6,108.3 L494.4,116.7 L500,130.6 L511.1,130.6 L522.2,127.8 L522.2,122.2 L527.8,119.4 L522.2,113.9 L511.1,111.1 Z"/>
+          <path d="M522.2,91.7 L513.9,88.9 L513.9,77.8 L522.2,72.2 L538.9,66.7 L544.4,61.1 L569.4,55.6 L577.8,52.8 L572.2,55.6 L555.6,61.1 L538.9,69.4 L522.2,77.8 L513.9,83.3 Z"/>
+          <path d="M505.6,108.3 L519.4,105.6 L522.2,100 L538.9,100 L538.9,111.1 L544.4,116.7 L544.4,119.4 L527.8,119.4 L522.2,122.2 L522.2,127.8 L516.7,127.8 L516.7,122.2 L494.4,116.7 Z"/>
+          <path d="M577.8,97.2 L588.9,105.6 L605.6,116.7 L622.2,116.7 L644.4,105.6 L661.1,94.4 L661.1,77.8 L666.7,66.7 L666.7,61.1 L688.9,50 L722.2,47.2 L794.4,47.2 L861.1,50 L888.9,55.6 L891.7,66.7 L891.7,83.3 L883.3,94.4 L866.7,105.6 L872.2,116.7 L866.7,127.8 L861.1,116.7 L822.2,116.7 L822.2,105.6 L800,105.6 L794.4,94.4 L761.1,94.4 L733.3,100 L705.6,105.6 L666.7,105.6 L644.4,100 L616.7,94.4 L605.6,94.4 L600,100 L588.9,97.2 L583.3,88.9 L577.8,83.3 L577.8,77.8 L561.1,61.1 L569.4,55.6 L577.8,52.8 L588.9,55.6 L605.6,61.1 L622.2,66.7 L644.4,72.2 L661.1,72.2 L661.1,77.8 L666.7,83.3 L655.6,88.9 L661.1,94.4 L644.4,97.2 L644.4,105.6 L622.2,111.1 L622.2,116.7 L605.6,116.7 L588.9,105.6 Z"/>
+          <path d="M572.2,133.3 L572.2,150 L577.8,150 L600,150 L605.6,144.4 L622.2,144.4 L622.2,138.9 L616.7,133.3 L605.6,133.3 L588.9,133.3 L577.8,133.3 Z"/>
+          <path d="M622.2,144.4 L633.3,155.6 L655.6,177.8 L666.7,177.8 L672.2,172.2 L672.2,166.7 L661.1,150 L655.6,144.4 L644.4,144.4 L638.9,138.9 L627.8,138.9 Z"/>
+          <path d="M588.9,166.7 L600,166.7 L611.1,172.2 L622.2,166.7 L633.3,166.7 L638.9,172.2 L655.6,177.8 L661.1,183.3 L666.7,188.9 L655.6,188.9 L644.4,194.4 L636.1,216.7 L622.2,216.7 L605.6,188.9 L594.4,172.2 L588.9,166.7 Z"/>
+          <path d="M511.1,216.7 L527.8,222.2 L522.2,227.8 L527.8,238.9 L511.1,238.9 L505.6,244.4 L494.4,244.4 L472.2,238.9 L450,250 L461.1,255.6 L472.2,250 L488.9,238.9 L505.6,244.4 L511.1,250 L516.7,261.1 L533.3,266.7 L550,266.7 L572.2,250 L583.3,238.9 L594.4,238.9 L605.6,250 L611.1,261.1 L605.6,272.2 L600,300 L572.2,344.4 L550,344.4 L544.4,327.8 L538.9,311.1 L538.9,305.6 L555.6,322.2 L583.3,322.2 L600,305.6 L605.6,272.2 L611.1,261.1 L605.6,250 L600,238.9 L611.1,227.8 L616.7,216.7 L611.1,200 L600,188.9 L594.4,166.7 L577.8,172.2 L577.8,183.3 L566.7,188.9 L561.1,205.6 L550,222.2 L538.9,227.8 L527.8,238.9 L522.2,238.9 L511.1,216.7 Z"/>
+          <path d="M750,105.6 L727.8,122.2 L711.1,138.9 L700,150 L716.7,150 L722.2,138.9 L738.9,111.1 L750,105.6 L777.8,100 L800,105.6 L827.8,111.1 L855.6,116.7 L861.1,127.8 L855.6,138.9 L866.7,144.4 L850,150 L833.3,150 L833.3,166.7 L800,161.1 L788.9,150 L766.7,172.2 L777.8,177.8 L788.9,183.3 L794.4,188.9 L800,200 L805.6,194.4 L833.3,177.8 L833.3,166.7 L850,150 L866.7,144.4 L855.6,138.9 L861.1,127.8 L855.6,116.7 L827.8,111.1 L800,105.6 L777.8,100 L750,105.6 Z"/>
+          <path d="M847.2,144.4 L850,155.6 L855.6,155.6 L861.1,150 L861.1,138.9 L850,138.9 Z"/>
+          <path d="M863.9,155.6 L877.8,155.6 L886.1,152.8 L888.9,150 L891.7,144.4 L891.7,138.9 L883.3,144.4 L877.8,150 L875,155.6 Z"/>
+          <path d="M855.6,288.9 L838.9,294.4 L822.2,305.6 L816.7,316.7 L816.7,327.8 L822.2,338.9 L830.6,344.4 L877.8,350 L888.9,350 L911.1,355.6 L916.7,347.2 L922.2,341.7 L925,327.8 L922.2,316.7 L911.1,305.6 L902.8,294.4 L877.8,283.3 L861.1,283.3 Z"/>
         </g>
         <g id="pins"></g>
       </svg>
@@ -234,6 +258,7 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--rim);display:
       <div class="s-date" id="sD">---</div>
       <div class="s-badge off" id="sBadge"><div class="sdot"></div><span id="sLbl">OFF</span></div>
     </div>
+
     <div class="panel search-panel">
       <div class="panel-line"></div>
       <div class="p-hdr"><span style="font-size:13px">🔍</span><span class="p-title">도시 시간 검색</span></div>
@@ -259,20 +284,21 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--rim);display:
   <div class="calc">
     <div class="panel-line"></div>
     <div class="calc-inner">
-      <span class="calc-lbl">⏱ 서울 기준 시차 예측</span>
+      <span class="calc-lbl">⏱ 서울 시각 기준 시차 예측</span>
       <input type="time" class="calc-inp" id="cIn">
       <button class="calc-go" onclick="applyCalc()">전체 적용</button>
       <button class="calc-rst" onclick="resetCalc()">실시간 복귀</button>
       <span class="prev-pill" id="pPill">⚡ PREVIEW</span>
     </div>
   </div>
-  <div class="calc" style="border-color:rgba(91,156,246,0.3)">
+
+  <div class="calc" style="border-color: rgba(91,156,246,0.3);">
     <div class="panel-line" style="background:linear-gradient(90deg,transparent,var(--c1),transparent)"></div>
     <div class="calc-inner">
-      <span class="calc-lbl" style="color:var(--c1)">🔄 현지 시각 ➔ 한국 시각</span>
+      <span class="calc-lbl" style="color:var(--c1);">🔄 로컬 현지 시각 ➔ 한국 시각</span>
       <select class="calc-select" id="calcCitySelect"></select>
       <input type="time" class="calc-inp" id="cLocalIn">
-      <button class="calc-go" style="background:var(--c1)" onclick="reverseCalc()">변환</button>
+      <button class="calc-go" style="background:var(--c1);" onclick="reverseCalc()">변환</button>
       <div class="result-display" id="reverseResult">KST --:--</div>
     </div>
   </div>
@@ -287,48 +313,51 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--rim);display:
 </div>
 
 <script>
-const REGIONS=[
-  {id:'am',label:'Americas',cities:[
-    {name:'Los Angeles',country:'USA',tz:'America/Los_Angeles',lat:34.052,lon:-118.244},
-    {name:'San Francisco',country:'USA',tz:'America/Los_Angeles',lat:37.774,lon:-122.419},
-    {name:'Dominican Republic',country:'Dominican Rep.',tz:'America/Santo_Domingo',lat:18.474,lon:-69.931},
+// ── DATA SYSTEM (추가 도시들의 메인 뷰 데이터 동기화 완료) ─────────────────────
+const REGIONS = [
+  { id:'am', label:'Americas', cities:[
+    { name:'Los Angeles',       country:'USA',            tz:'America/Los_Angeles',   lat:34.052,  lon:-118.244 },
+    { name:'San Francisco',      country:'USA',            tz:'America/Los_Angeles',   lat:37.774,  lon:-122.419 },
+    { name:'Dominican Republic', country:'Dominican Rep.', tz:'America/Santo_Domingo', lat:18.474,  lon:-69.931   },
   ]},
-  {id:'eu',label:'Europe',cities:[
-    {name:'Amsterdam',country:'Netherlands',tz:'Europe/Amsterdam',lat:52.374,lon:4.890},
-    {name:'Barcelona',country:'Spain',tz:'Europe/Madrid',lat:41.385,lon:2.173},
-    {name:'Geneva',country:'Switzerland',tz:'Europe/Zurich',lat:46.204,lon:6.143},
-    {name:'London',country:'UK',tz:'Europe/London',lat:51.507,lon:-0.128},
-    {name:'Moscow',country:'Russia',tz:'Europe/Moscow',lat:55.751,lon:37.618},
-    {name:'Stockholm',country:'Sweden',tz:'Europe/Stockholm',lat:59.333,lon:18.065},
+  { id:'eu', label:'Europe', cities:[
+    { name:'Amsterdam',  country:'Netherlands', tz:'Europe/Amsterdam', lat:52.374, lon:4.890  },
+    { name:'Barcelona',  country:'Spain',       tz:'Europe/Madrid',    lat:41.385, lon:2.173  },
+    { name:'Geneva',     country:'Switzerland', tz:'Europe/Zurich',    lat:46.204, lon:6.143  },
+    { name:'London',     country:'UK',          tz:'Europe/London',    lat:51.507, lon:-0.128 },
+    { name:'Moscow',     country:'Russia',      tz:'Europe/Moscow',    lat:55.751, lon:37.618 },
+    { name:'Stockholm',  country:'Sweden',      tz:'Europe/Stockholm', lat:59.333, lon:18.065 },
   ]},
-  {id:'me',label:'Middle East & Africa',cities:[
-    {name:'Abuja',country:'Nigeria',tz:'Africa/Lagos',lat:9.076,lon:7.398},
-    {name:'Angola',country:'Angola',tz:'Africa/Luanda',lat:-8.836,lon:13.234},
-    {name:'Dubai',country:'UAE',tz:'Asia/Dubai',lat:25.204,lon:55.271},
-    {name:'Istanbul',country:'Türkiye',tz:'Europe/Istanbul',lat:41.015,lon:28.979},
-    {name:'Port Louis',country:'Mauritius',tz:'Indian/Mauritius',lat:-20.161,lon:57.501},
-    {name:'Riyadh',country:'Saudi Arabia',tz:'Asia/Riyadh',lat:24.688,lon:46.722},
+  { id:'me', label:'Middle East & Africa', cities:[
+    { name:'Abuja',    country:'Nigeria',      tz:'Africa/Lagos',    lat:9.076,   lon:7.398  },
+    { name:'Angola',   country:'Angola',       tz:'Africa/Luanda',   lat:-8.836,  lon:13.234 },
+    { name:'Dubai',    country:'UAE',          tz:'Asia/Dubai',      lat:25.204,  lon:55.271 },
+    { name:'Istanbul', country:'Türkiye',      tz:'Europe/Istanbul', lat:41.015,  lon:28.979 },
+    { name:'Port Louis',country:'Mauritius',   tz:'Indian/Mauritius',lat:-20.161, lon:57.501 },
+    { name:'Riyadh',   country:'Saudi Arabia', tz:'Asia/Riyadh',     lat:24.688,  lon:46.722 },
   ]},
-  {id:'as',label:'Asia & Oceania',cities:[
-    {name:'Brisbane',country:'Australia',tz:'Australia/Brisbane',lat:-27.469,lon:153.025},
-    {name:'Canberra',country:'Australia',tz:'Australia/Canberra',lat:-35.280,lon:149.128},
-    {name:'Delhi',country:'India',tz:'Asia/Kolkata',lat:28.614,lon:77.209},
-    {name:'Melbourne',country:'Australia',tz:'Australia/Melbourne',lat:-37.814,lon:144.963},
-    {name:'Mumbai',country:'India',tz:'Asia/Kolkata',lat:19.076,lon:72.877},
-    {name:'Shanghai',country:'China',tz:'Asia/Shanghai',lat:31.228,lon:121.474},
-    {name:'Sydney',country:'Australia',tz:'Australia/Sydney',lat:-33.868,lon:151.209},
+  { id:'as', label:'Asia & Oceania', cities:[
+    { name:'Brisbane',  country:'Australia',   tz:'Australia/Brisbane', lat:-27.469, lon:153.025 },
+    { name:'Canberra',  country:'Australia',   tz:'Australia/Canberra', lat:-35.280, lon:149.128 },
+    { name:'Delhi',     country:'India',       tz:'Asia/Kolkata',       lat:28.614,  lon:77.209  },
+    { name:'Melbourne', country:'Australia',   tz:'Australia/Melbourne',lat:-37.814, lon:144.963 },
+    { name:'Mumbai',    country:'India',       tz:'Asia/Kolkata',       lat:19.076,  lon:72.877  },
+    { name:'Shanghai',  country:'China',       tz:'Asia/Shanghai',      lat:31.228,  lon:121.474 },
+    { name:'Sydney',    country:'Australia',   tz:'Australia/Sydney',   lat:-33.868, lon:151.209 },
   ]},
 ];
-const SEOUL={name:'Seoul',country:'South Korea',tz:'Asia/Seoul',lat:37.566,lon:126.978};
-const RC={am:'#5b9cf6',eu:'#9d7cf5',me:'#f5a541',as:'#3ecfaa',kr:'#f06292'};
-const GLOBAL_CITY_MAP={
-  'abuja':{name:'Abuja',country:'Nigeria',tz:'Africa/Lagos'},
-  'port louis':{name:'Port Louis',country:'Mauritius',tz:'Indian/Mauritius'},
-  'delhi':{name:'Delhi',country:'India',tz:'Asia/Kolkata'},
-  'brisbane':{name:'Brisbane',country:'Australia',tz:'Australia/Brisbane'},
-  'canberra':{name:'Canberra',country:'Australia',tz:'Australia/Canberra'},
-  'rome':{name:'Rome',country:'Italy',tz:'Europe/Rome'},
-  'osaka':{name:'Osaka',country:'Japan',tz:'Asia/Tokyo'},
+const SEOUL = { name:'Seoul', country:'South Korea', tz:'Asia/Seoul', lat:37.566, lon:126.978 };
+const RC = { am:'#5b9cf6', eu:'#9d7cf5', me:'#f5a541', as:'#3ecfaa', kr:'#f06292' };
+
+// 글로벌 마스터 검색 인덱스 사전
+const GLOBAL_CITY_MAP = {
+  'abuja': {name:'Abuja', country:'Nigeria', tz:'Africa/Lagos'},
+  'port louis': {name:'Port Louis', country:'Mauritius', tz:'Indian/Mauritius'},
+  'delhi': {name:'Delhi', country:'India', tz:'Asia/Kolkata'},
+  'brisbane': {name:'Brisbane', country:'Australia', tz:'Australia/Brisbane'},
+  'canberra': {name:'Canberra', country:'Australia', tz:'Australia/Canberra'},
+  'rome': { name: 'Rome', country: 'Italy', tz: 'Europe/Rome' },
+  'osaka': { name: 'Osaka', country: 'Japan', tz: 'Asia/Tokyo' },
   'tokyo':{name:'Tokyo',country:'Japan',tz:'Asia/Tokyo'},
   'new york':{name:'New York',country:'USA',tz:'America/New_York'},
   'london':{name:'London',country:'UK',tz:'Europe/London'},
@@ -338,94 +367,80 @@ const GLOBAL_CITY_MAP={
   'paris':{name:'Paris',country:'France',tz:'Europe/Paris'},
   'berlin':{name:'Berlin',country:'Germany',tz:'Europe/Berlin'},
   'amsterdam':{name:'Amsterdam',country:'Netherlands',tz:'Europe/Amsterdam'},
-  'seoul':{name:'Seoul',country:'South Korea',tz:'Asia/Seoul'},
-  'istanbul':{name:'Istanbul',country:'Türkiye',tz:'Europe/Istanbul'},
-  'dubai':{name:'Dubai',country:'UAE',tz:'Asia/Dubai'},
-  'riyadh':{name:'Riyadh',country:'Saudi Arabia',tz:'Asia/Riyadh'},
-  'moscow':{name:'Moscow',country:'Russia',tz:'Europe/Moscow'},
-  'shanghai':{name:'Shanghai',country:'China',tz:'Asia/Shanghai'},
+  'seoul':{name:'Seoul',country:'South Korea',tz:'Asia/Seoul'}
 };
 
-let calcOff=0, searched=[], ttCityRef=null;
-const getNow=()=>new Date(Date.now()+calcOff);
+let calcOff = 0, searched = [], hov = null;
 
-// 중요: 찢어짐 없는 1009x665 메르카토르 정밀 매핑 공식 복원
-function ll2xy(lat,lon){
-  const x=(lon+180)/360*1009;
-  const latR=lat*Math.PI/180;
-  const mercN=Math.log(Math.tan(Math.PI/4+latR/2));
-  const y=665/2-mercN*1009/(2*Math.PI); // 격자 간격 보정 계수 수정 고정
-  return {x,y};
-}
+const getNow = () => new Date(Date.now() + calcOff);
+const ll2xy = (lat,lon) => ({ x:(lon+180)/360*1000, y:(90-lat)/180*500 });
 
-const fmtT=(d,tz)=>d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
-const fmtTS=(d,tz)=>d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false});
-const fmtD=(d,tz)=>d.toLocaleDateString('en-GB',{timeZone:tz,weekday:'short',month:'short',day:'numeric'});
+const fmtT  = (d,tz) => d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+const fmtTS = (d,tz) => d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false});
+const fmtD  = (d,tz) => d.toLocaleDateString('en-GB',{timeZone:tz,weekday:'short',month:'short',day:'numeric'});
 
 function isWork(d,tz){
-  try{
+  try {
     const p=d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).split(':');
-    return +p[0]*60+ +p[1]>=540&&+p[0]*60+ +p[1]<1080;
-  }catch(e){return false;}
+    return +p[0]*60+ +p[1] >= 540 && +p[0]*60+ +p[1] < 1080;
+  } catch(e){return false;}
 }
 function getOff(tz){
-  try{
+  try {
     const n=new Date(),a=new Date(n.toLocaleString('en-US',{timeZone:tz})),b=new Date(n.toLocaleString('en-US',{timeZone:'Asia/Seoul'}));
     const d=Math.round((a-b)/3600000); return d>=0?`+${d}h`:`${d}h`;
-  }catch(e){return'+0h';}
+  } catch(e){return "+0h";}
 }
 
+// ── MAP PINS ──────────────────────────────────────────────────────────────────
 function buildPins(){
-  const g=document.getElementById('pins'); g.innerHTML='';
-  const NS='http://www.w3.org/2000/svg';
-  const all=[];
+  const g = document.getElementById('pins'); g.innerHTML = '';
+  const all = [];
   REGIONS.forEach(r=>r.cities.forEach(c=>all.push({...c,rid:r.id})));
   all.push({...SEOUL,rid:'kr'});
+  const NS = 'http://www.w3.org/2000/svg';
+
   all.forEach(city=>{
-    const {x,y}=ll2xy(city.lat,city.lon);
-    if (y < 0 || y > 665) return; // 한계 축 예외 처리
-    const col=RC[city.rid];
-    const g2=document.createElementNS(NS,'g'); g2.style.cursor='pointer';
-    const ring=document.createElementNS(NS,'circle');
+    const {x,y} = ll2xy(city.lat, city.lon); const col = RC[city.rid];
+    const g2 = document.createElementNS(NS,'g'); g2.style.cursor = 'pointer';
+
+    const ring = document.createElementNS(NS,'circle');
     ring.setAttribute('cx',x.toFixed(1)); ring.setAttribute('cy',y.toFixed(1));
-    ring.setAttribute('r','5'); ring.setAttribute('fill','none');
-    ring.setAttribute('stroke',col); ring.setAttribute('stroke-width','1.2'); ring.setAttribute('opacity','0.5');
-    const dot=document.createElementNS(NS,'circle');
+    ring.setAttribute('r','5'); ring.setAttribute('fill','none'); ring.setAttribute('stroke',col); ring.setAttribute('stroke-width','1.2'); ring.setAttribute('opacity','0.45');
+
+    const dot = document.createElementNS(NS,'circle');
     dot.setAttribute('cx',x.toFixed(1)); dot.setAttribute('cy',y.toFixed(1));
-    dot.setAttribute('r','3'); dot.setAttribute('fill',col);
-    const lbl=document.createElementNS(NS,'text');
-    lbl.setAttribute('x',(x+5).toFixed(1)); lbl.setAttribute('y',(y-5).toFixed(1));
-    lbl.setAttribute('font-family','Syne,sans-serif'); lbl.setAttribute('font-size','7.5');
-    lbl.setAttribute('font-weight','600'); lbl.setAttribute('fill',col);
-    lbl.setAttribute('opacity','0.75'); lbl.setAttribute('pointer-events','none');
-    lbl.textContent=city.name.split(' ')[0];
+    dot.setAttribute('r','2.8'); dot.setAttribute('fill',col);
+
+    const lbl = document.createElementNS(NS,'text');
+    lbl.setAttribute('x',(x+4).toFixed(1)); lbl.setAttribute('y',(y-4).toFixed(1));
+    lbl.setAttribute('font-family','Syne,sans-serif'); lbl.setAttribute('font-size','7');
+    lbl.setAttribute('font-weight','600'); lbl.setAttribute('fill',col); lbl.setAttribute('opacity','0.65'); lbl.setAttribute('pointer-events','none');
+    lbl.textContent = city.name.split(' ')[0].replace(/[()]/g,'');
+
     g2.appendChild(ring); g2.appendChild(dot); g2.appendChild(lbl);
-    g2.addEventListener('mouseenter',()=>showTT(city));
-    g2.addEventListener('mouseleave',hideTT);
+    g2.addEventListener('mouseenter', e=>showTT(city)); g2.addEventListener('mouseleave', hideTT);
     g.appendChild(g2);
   });
 }
 
+let ttCityRef = null;
 function showTT(city){
-  ttCityRef=city; const now=getNow();
-  document.getElementById('ttCity').textContent=city.name;
-  document.getElementById('ttCtry').textContent=city.country;
-  document.getElementById('ttTime').textContent=fmtT(now,city.tz);
-  document.getElementById('ttDate').textContent=fmtD(now,city.tz);
-  const w=isWork(now,city.tz); const s=document.getElementById('ttStat');
-  s.className=`tt-status ${w?'on':'off'}`; document.getElementById('ttLbl').textContent=w?'OPEN':'OFF';
-  const svg=document.getElementById('wmap'); const sr=svg.getBoundingClientRect();
-  const wr=document.getElementById('mapBox').getBoundingClientRect();
-  const {x,y}=ll2xy(city.lat,city.lon);
-  const sx=sr.width/1009, sy=sr.height/665;
-  const tt=document.getElementById('tt');
-  let tx=sr.left-wr.left+x*sx+8;
-  let ty=sr.top-wr.top+y*sy-30;
-  if(tx+160>wr.width) tx-=168;
-  if(ty<4) ty=y*sy+10;
-  tt.style.left=tx+'px'; tt.style.top=ty+'px'; tt.classList.add('on');
+  ttCityRef = city; const now = getNow();
+  document.getElementById('ttCity').textContent = city.name;
+  document.getElementById('ttCtry').textContent = city.country;
+  document.getElementById('ttTime').textContent = fmtT(now, city.tz);
+  document.getElementById('ttDate').textContent = fmtD(now, city.tz);
+  const w = isWork(now, city.tz); const s = document.getElementById('ttStat');
+  s.className = `tt-status ${w?'on':'off'}`; document.getElementById('ttLbl').textContent = w ? 'OPEN' : 'OFF';
+
+  const svg = document.getElementById('wmap'); const sr = svg.getBoundingClientRect(); const wr = document.getElementById('mapBox').getBoundingClientRect();
+  const {x,y} = ll2xy(city.lat, city.lon); const sx = sr.width/1000, sy = sr.height/500; const tt = document.getElementById('tt');
+  let tx = sr.left-wr.left + x*sx + 8; let ty = sr.top -wr.top  + y*sy - 30;
+  if(tx+155 > wr.width) tx -= 163; if(ty < 4) ty = y*sy + 10;
+  tt.style.left = tx+'px'; tt.style.top = ty+'px'; tt.classList.add('on');
 }
-function hideTT(){ttCityRef=null; document.getElementById('tt').classList.remove('on');}
+function hideTT(){ ttCityRef=null; document.getElementById('tt').classList.remove('on'); }
 function refreshTT(){
   if(!ttCityRef) return; const now=getNow();
   document.getElementById('ttTime').textContent=fmtT(now,ttCityRef.tz);
@@ -435,19 +450,23 @@ function refreshTT(){
 }
 
 function buildRegions(){
-  const el=document.getElementById('rgs'); el.innerHTML='';
-  const select=document.getElementById('calcCitySelect'); select.innerHTML='';
-  let opts=[];
+  const el = document.getElementById('rgs'); el.innerHTML = '';
+  const select = document.getElementById('calcCitySelect'); select.innerHTML = '';
+  let selectOptions = [];
+
   REGIONS.forEach((r,ri)=>{
-    const sec=document.createElement('div'); sec.className=`region-${r.id}`;
-    sec.innerHTML=`<div class="rg-hdr"><div class="rg-line"></div><div class="rg-tag"><div class="rg-dot"></div>${r.label}</div><span class="rg-n">${r.cities.length} cities</span><div class="rg-line"></div></div>`;
-    const grid=document.createElement('div'); grid.className='city-grid';
+    const sec = document.createElement('div'); sec.className = `region-${r.id}`;
+    sec.innerHTML = `<div class="rg-hdr"><div class="rg-line"></div><div class="rg-tag"><div class="rg-dot"></div>${r.label}</div><span class="rg-n">${r.cities.length} cities</span><div class="rg-line"></div></div>`;
+    const grid = document.createElement('div'); grid.className = 'city-grid';
+    
     r.cities.forEach((c,ci)=>{
-      opts.push(c);
-      const card=document.createElement('div'); card.className='c-card';
-      card.innerHTML=`
-        <div class="cc-top"><div><div class="cc-name">${c.name}</div><div class="cc-ctry">${c.country}</div></div>
-        <div class="w-tag off" id="wt-${r.id}-${ci}"><div class="wd"></div><span id="wl-${r.id}-${ci}">OFF</span></div></div>
+      selectOptions.push(c);
+      const card = document.createElement('div'); card.className = 'c-card'; card.style.animationDelay = `${(ri*6+ci)*0.04}s`;
+      card.innerHTML = `
+        <div class="cc-top">
+          <div><div class="cc-name">${c.name}</div><div class="cc-ctry">${c.country}</div></div>
+          <div class="w-tag off" id="wt-${r.id}-${ci}"><div class="wd"></div><span id="wl-${r.id}-${ci}">OFF</span></div>
+        </div>
         <div class="cc-time" id="ct-${r.id}-${ci}">--:--:--</div>
         <div class="cc-date" id="cd-${r.id}-${ci}">---</div>
         <div class="cc-off">${getOff(c.tz)} vs Seoul</div>`;
@@ -455,27 +474,29 @@ function buildRegions(){
     });
     sec.appendChild(grid); el.appendChild(sec);
   });
-  [...opts,{name:'Rome',tz:'Europe/Rome'},{name:'Osaka',tz:'Asia/Tokyo'}]
-    .sort((a,b)=>a.name.localeCompare(b.name))
-    .forEach(c=>{
-      const opt=document.createElement('option'); opt.value=c.tz;
-      opt.textContent=`${c.name} (${getOff(c.tz)})`; select.appendChild(opt);
-    });
+
+  const extraOptions = [
+    { name: 'Rome', tz: 'Europe/Rome' },
+    { name: 'Osaka', tz: 'Asia/Tokyo' }
+  ];
+  const finalOptions = [...selectOptions, ...extraOptions];
+
+  finalOptions.sort((a, b) => a.name.localeCompare(b.name)).forEach(c => {
+    const opt = document.createElement('option'); opt.value = c.tz; opt.textContent = `${c.name} (${getOff(c.tz)})`;
+    select.appendChild(opt);
+  });
 }
 
 function tick(){
-  const now=getNow(), tz='Asia/Seoul';
-  document.getElementById('hT').textContent=fmtT(now,tz);
-  document.getElementById('hD').textContent=fmtD(now,tz);
-  document.getElementById('sT').textContent=fmtT(now,tz);
-  document.getElementById('sD').textContent=fmtD(now,tz);
+  const now = getNow(), tz = 'Asia/Seoul';
+  document.getElementById('hT').textContent = fmtT(now,tz); document.getElementById('hD').textContent = fmtD(now,tz);
+  document.getElementById('sT').textContent = fmtT(now,tz); document.getElementById('sD').textContent = fmtD(now,tz);
   const sw=isWork(now,tz), sb=document.getElementById('sBadge');
   sb.className=`s-badge ${sw?'on':'off'}`; document.getElementById('sLbl').textContent=sw?'OPEN':'OFF';
+  
   REGIONS.forEach(r=>r.cities.forEach((c,ci)=>{
-    const t=document.getElementById(`ct-${r.id}-${ci}`);
-    const d=document.getElementById(`cd-${r.id}-${ci}`);
-    const w=document.getElementById(`wt-${r.id}-${ci}`);
-    const wl=document.getElementById(`wl-${r.id}-${ci}`);
+    const t=document.getElementById(`ct-${r.id}-${ci}`); const d=document.getElementById(`cd-${r.id}-${ci}`);
+    const w=document.getElementById(`wt-${r.id}-${ci}`); const wl=document.getElementById(`wl-${r.id}-${ci}`);
     if(!t) return;
     t.textContent=fmtT(now,c.tz); d.textContent=fmtD(now,c.tz);
     const ok=isWork(now,c.tz); w.className=`w-tag ${ok?'on':'off'}`; wl.textContent=ok?'OPEN':'OFF';
@@ -483,27 +504,37 @@ function tick(){
   updateSearch(); refreshTT();
 }
 
-function qs(n){document.getElementById('sIn').value=n; doSearch();}
+// ── SEARCH SYSTEM ────────────────────────────────────────────────────────────
+function qs(n){ document.getElementById('sIn').value=n; doSearch(); }
 function doSearch(){
   const raw=document.getElementById('sIn').value.trim(); if(!raw) return;
   const q=raw.toLowerCase(); let found=GLOBAL_CITY_MAP[q];
-  if(!found){const k=Object.keys(GLOBAL_CITY_MAP).find(k=>k.includes(q)||q.includes(k)); if(k) found=GLOBAL_CITY_MAP[k];}
+  if(!found){ const k=Object.keys(GLOBAL_CITY_MAP).find(k=>k.includes(q)||q.includes(k)); if(k) found=GLOBAL_CITY_MAP[k]; }
   if(!found){
-    try{Intl.DateTimeFormat(undefined,{timeZone:raw}); found={name:raw.split('/')[1]||raw,country:'Global System',tz:raw};}
-    catch(e){document.getElementById('rList').innerHTML=`<div class="r-empty">😕 "${raw}" 를 찾을 수 없습니다</div>`; return;}
+    try {
+      Intl.DateTimeFormat(undefined, {timeZone: raw});
+      found = { name: raw.split('/')[1] || raw, country: 'Global System', tz: raw };
+    } catch (e) {
+      document.getElementById('rList').innerHTML=`<div class="r-empty">😕 <b style="color:var(--body)">"${raw}"</b> 를 찾을 수 없습니다</div>`;
+      return;
+    }
   }
-  if(!searched.find(c=>c.tz===found.tz&&c.name===found.name)){searched.unshift(found); if(searched.length>8) searched.pop(); }
+  if(!searched.find(c=>c.tz===found.tz&&c.name===found.name)){ searched.unshift(found); if(searched.length>8) searched.pop(); }
   document.getElementById('sIn').value=''; renderSearch();
 }
 function renderSearch(){
   const el=document.getElementById('rList');
-  if(!searched.length){el.innerHTML='<div class="r-empty">검색한 도시의 현재 시간이<br>여기에 표시됩니다</div>'; return;}
+  if(!searched.length){ el.innerHTML='<div class="r-empty">검색한 도시의 현재 시간이<br>여기에 표시됩니다</div>'; return; }
   el.innerHTML='';
   searched.forEach((c,i)=>{
     const item=document.createElement('div'); item.className='r-item';
-    item.innerHTML=`<div class="ri-info"><div class="ri-city">${c.name}</div><div class="ri-ctry">${c.country}</div></div>
-      <div class="ri-r"><div class="ri-time" id="rt-${i}">--:--</div><div class="ri-date" id="rd-${i}">---</div>
-      <div class="ri-badge off" id="rb-${i}">● OFF</div></div>
+    item.innerHTML=`
+      <div class="ri-info"><div class="ri-city">${c.name}</div><div class="ri-ctry">${c.country}</div></div>
+      <div class="ri-r">
+        <div class="ri-time" id="rt-${i}">--:--</div>
+        <div class="ri-date" id="rd-${i}">---</div>
+        <div class="ri-badge off" id="rb-${i}">● OFF</div>
+      </div>
       <button class="ri-rm" onclick="rmS(${i})">×</button>`;
     el.appendChild(item);
   });
@@ -518,8 +549,9 @@ function updateSearch(){
     const w=isWork(now,c.tz); b.textContent=w?'● OPEN':'● OFF'; b.className=`ri-badge ${w?'on':'off'}`;
   });
 }
-function rmS(i){searched.splice(i,1); renderSearch();}
+function rmS(i){ searched.splice(i,1); renderSearch(); }
 
+// ── CALCULATORS ──────────────────────────────────────────────────────────────
 function applyCalc(){
   const v=document.getElementById('cIn').value; if(!v) return;
   const [hh,mm]=v.split(':').map(Number);
@@ -528,28 +560,27 @@ function applyCalc(){
   calcOff=tgt-sn; document.getElementById('pPill').classList.add('on'); tick();
 }
 function resetCalc(){
-  calcOff=0; document.getElementById('cIn').value='';
-  document.getElementById('pPill').classList.remove('on'); tick();
+  calcOff=0; document.getElementById('cIn').value=''; document.getElementById('pPill').classList.remove('on'); tick();
 }
-function reverseCalc(){
-  const timeVal=document.getElementById('cLocalIn').value;
-  const tzVal=document.getElementById('calcCitySelect').value;
-  if(!timeVal) return;
-  const [hours,minutes]=timeVal.split(':').map(Number);
-  const formatter=new Intl.DateTimeFormat('en-US',{timeZone:tzVal,year:'numeric',month:'numeric',day:'numeric'});
-  const parts=formatter.formatToParts(new Date());
-  const m=parts.find(p=>p.type==='month').value, d=parts.find(p=>p.type==='day').value, y=parts.find(p=>p.type==='year').value;
-  const localIso=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}T${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:00`;
-  const diff=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Seoul'}))-new Date(new Date().toLocaleString('en-US',{timeZone:tzVal}));
-  const fs=new Date(new Date(localIso).getTime()+diff);
-  document.getElementById('reverseResult').textContent=`KST ${String(fs.getHours()).padStart(2,'0')}:${String(fs.getMinutes()).padStart(2,'0')}`;
+function reverseCalc() {
+  const timeVal = document.getElementById('cLocalIn').value; const tzVal = document.getElementById('calcCitySelect').value;
+  if (!timeVal) return;
+  const [hours, minutes] = timeVal.split(':').map(Number);
+  const formatter = new Intl.DateTimeFormat('en-US', { timeZone: tzVal, year: 'numeric', month: 'numeric', day: 'numeric' });
+  const parts = formatter.formatToParts(new Date());
+  const m = parts.find(p => p.type === 'month').value; const d = parts.find(p => p.type === 'day').value; const y = parts.find(p => p.type === 'year').value;
+  const localIso = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}T${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:00`;
+  const seoulDateStr = new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }); const tzDateStr = new Date().toLocaleString('en-US', { timeZone: tzVal });
+  const diff = new Date(seoulDateStr) - new Date(tzDateStr);
+  const finalSeoulTime = new Date(new Date(localIso).getTime() + diff);
+  document.getElementById('reverseResult').textContent = `KST ${String(finalSeoulTime.getHours()).padStart(2,'0')}:${String(finalSeoulTime.getMinutes()).padStart(2,'0')}`;
 }
 
-document.getElementById('cIn').addEventListener('keydown',e=>{if(e.key==='Enter') applyCalc();});
-document.getElementById('sIn').addEventListener('keydown',e=>{if(e.key==='Enter') doSearch();});
-document.getElementById('cLocalIn').addEventListener('keydown',e=>{if(e.key==='Enter') reverseCalc();});
+document.getElementById('cIn').addEventListener('keydown',e=>{ if(e.key==='Enter') applyCalc(); });
+document.getElementById('sIn').addEventListener('keydown',e=>{ if(e.key==='Enter') doSearch(); });
+document.getElementById('cLocalIn').addEventListener('keydown',e=>{ if(e.key==='Enter') reverseCalc(); });
 
-buildRegions(); buildPins(); tick(); setInterval(tick,1000);
+buildRegions(); buildPins(); tick(); setInterval(tick, 1000);
 </script>
 </body>
 </html>
