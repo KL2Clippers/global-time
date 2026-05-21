@@ -87,25 +87,24 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .s-inp:focus{border-color:var(--c3);box-shadow:0 0 0 3px rgba(245,165,65,.09)}
 .s-inp::placeholder{color:var(--dim)}
 .s-btn{background:var(--c3);border:none;border-radius:8px;color:#000;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.09em;padding:8px 13px;cursor:pointer;transition:opacity .15s,transform .12s;white-space:nowrap}
-.s-btn:hover{opacity:.85;transform:translateY(-1px)}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px}
 .chip{background:var(--card2);border:1px solid var(--rim);border-radius:5px;padding:3px 8px;font-size:9px;color:var(--muted);cursor:pointer;transition:all .13s;letter-spacing:.04em;font-weight:600}
 .chip:hover{border-color:var(--c3);color:var(--c3)}
-.r-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--rim) transparent}
+.r-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;}
 .r-item{background:var(--card2);border:1px solid var(--rim);border-radius:8px;padding:9px 11px;display:flex;align-items:center;gap:8px;animation:fadeup .2s ease both}
 @keyframes fadeup{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .ri-info{flex:1;min-width:0}
 .ri-city{font-size:12px;font-weight:700;color:var(--hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ri-ctry{font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:.04em}
+.ri-ctry{font-size:9px;color:var(--muted);margin-top:2px;}
 .ri-r{text-align:right;flex-shrink:0}
 .ri-time{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--c4)}
 .ri-date{font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px}
-.ri-badge{display:inline-flex;align-items:center;gap:3px;margin-top:3px;padding:2px 6px;border-radius:20px;border:1px solid;font-size:7px;font-weight:700;letter-spacing:.1em}
+.ri-badge{display:inline-flex;align-items:center;gap:3px;margin-top:3px;padding:2px 6px;border-radius:20px;border:1px solid;font-size:7px;font-weight:700;}
 .ri-badge.on{color:var(--go);border-color:var(--go3);background:var(--go2)}
 .ri-badge.off{color:var(--dim);border-color:var(--rim)}
-.ri-rm{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:2px;transition:color .13s;line-height:1;flex-shrink:0}
+.ri-rm{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:2px;flex-shrink:0}
 .ri-rm:hover{color:#ef4444}
-.r-empty{font-size:11px;color:var(--dim);text-align:center;padding:18px 0;letter-spacing:.04em;line-height:1.8}
+.r-empty{font-size:11px;color:var(--dim);text-align:center;padding:18px 0;line-height:1.8}
 
 /* CALC BAR SYSTEM */
 .calc-container { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 13px; }
@@ -116,11 +115,10 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .calc-inp{background:var(--card2);border:1px solid var(--rim);border-radius:7px;color:var(--hi);font-family:'JetBrains Mono',monospace;font-size:14px;padding:7px 12px;outline:none;width:120px;transition:border-color .15s,box-shadow .15s}
 .calc-inp:focus{border-color:var(--c4);box-shadow:0 0 0 3px rgba(62,207,170,.09)}
 .calc-select{background:var(--card2);border:1px solid var(--rim);border-radius:7px;color:var(--hi);font-family:'Syne',sans-serif;font-size:13px;padding:7px 10px;outline:none;width:170px;}
-.calc-go{background:linear-gradient(135deg,var(--c1),var(--c4));border:none;border-radius:7px;color:#000;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:opacity .15s,transform .12s}
-.calc-go:hover{opacity:.85;transform:translateY(-1px)}
-.calc-rst{background:transparent;border:1px solid var(--rim);border-radius:7px;color:var(--muted);font-family:'Syne',sans-serif;font-size:11px;font-weight:600;letter-spacing:.07em;padding:7px 12px;cursor:pointer;transition:all .15s}
+.calc-go{background:linear-gradient(135deg,var(--c1),var(--c4));border:none;border-radius:7px;color:#000;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:8px 14px;cursor:pointer;}
+.calc-rst{background:transparent;border:1px solid var(--rim);border-radius:7px;color:var(--muted);font-family:'Syne',sans-serif;font-size:11px;font-weight:600;padding:7px 12px;cursor:pointer;}
 .calc-rst:hover{border-color:var(--sub);color:var(--hi)}
-.prev-pill{display:none;align-items:center;gap:5px;background:rgba(245,165,65,.1);border:1px solid rgba(245,165,65,.28);border-radius:6px;padding:3px 9px;font-size:9px;font-weight:700;color:var(--c3);letter-spacing:.11em}
+.prev-pill{display:none;align-items:center;gap:5px;background:rgba(245,165,65,.1);border:1px solid rgba(245,165,65,.28);border-radius:6px;padding:3px 9px;font-size:9px;font-weight:700;color:var(--c3);}
 .prev-pill.on{display:flex}
 .result-display { font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--c3); font-weight: 600; margin-left: auto; }
 
@@ -130,7 +128,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .rg-line{flex:1;height:1px;background:var(--rim)}
 .rg-tag{display:flex;align-items:center;gap:6px;padding:3px 11px;border-radius:20px;border:1px solid;font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase}
 .rg-dot{width:5px;height:5px;border-radius:50%}
-.rg-n{font-size:9px;color:var(--dim);letter-spacing:.05em}
+.rg-n{font-size:9px;color:var(--dim)}
 .region-am .rg-tag{color:var(--c1);border-color:rgba(91,156,246,.25);background:rgba(91,156,246,.06)}
 .region-am .rg-dot{background:var(--c1)}
 .region-eu .rg-tag{color:var(--c2);border-color:rgba(157,124,245,.25);background:rgba(157,124,245,.06)}
@@ -140,9 +138,9 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .region-as .rg-tag{color:var(--c4);border-color:rgba(62,207,170,.25);background:rgba(62,207,170,.06)}
 .region-as .rg-dot{background:var(--c4)}
 .city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:8px}
-.c-card{background:var(--card);border:1px solid var(--rim);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;transition:border-color .2s,background .2s,transform .18s;animation:fadeup .35s ease both}
-.c-card:hover{background:var(--card2);border-color:var(--rim2);transform:translateY(-2px)}
-.c-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .2s}
+.c-card{background:var(--card);border:1px solid var(--rim);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;transition:0.2s;animation:fadeup .35s ease both}
+.c-card:hover{background:var(--card2);transform:translateY(-2px)}
+.c-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;}
 .c-card:hover::after{opacity:1}
 .region-am .c-card::after{background:linear-gradient(90deg,transparent,var(--c1),transparent)}
 .region-eu .c-card::after{background:linear-gradient(90deg,transparent,var(--c2),transparent)}
@@ -151,33 +149,17 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .cc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:9px}
 .cc-name{font-size:13px;font-weight:700;color:var(--hi);line-height:1.2}
 .cc-ctry{font-size:9px;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
-.w-tag{display:flex;align-items:center;gap:3px;padding:2px 6px;border-radius:20px;border:1px solid;font-size:8px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;flex-shrink:0}
+.w-tag{display:flex;align-items:center;gap:3px;padding:2px 6px;border-radius:20px;border:1px solid;font-size:8px;font-weight:700;flex-shrink:0}
 .w-tag.on{color:var(--go);border-color:var(--go3);background:var(--go2)}
 .w-tag.off{color:var(--dim);border-color:var(--rim)}
 .wd{width:4px;height:4px;border-radius:50%}
-.w-tag.on .wd{background:var(--go);animation:pulse 2s infinite}
-.w-tag.off .wd{background:var(--dim)}
-.cc-time{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:400;color:var(--body);letter-spacing:-.02em;line-height:1;margin-bottom:4px;transition:color .18s}
+.cc-time{font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--body);line-height:1;margin-bottom:4px;}
 .c-card:hover .cc-time{color:#fff}
-.cc-date{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.05em}
-.cc-off{font-size:8px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-top:5px;letter-spacing:.03em}
+.cc-date{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);}
+.cc-off{font-size:8px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-top:5px;}
 
 footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--rim);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.ft{font-size:10px;color:var(--dim);letter-spacing:.06em}
-
-@media(max-width:1150px){.calc-container{grid-template-columns:1fr;}}
-@media(max-width:1060px){.main{grid-template-columns:1fr}}
-@media(max-width:700px){
-  .wrap{padding:0 12px 60px}
-  .city-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px}
-  .cc-time{font-size:20px}.c-card{padding:11px 12px}
-}
-@media(max-width:460px){
-  .city-grid{grid-template-columns:1fr 1fr}
-  .calc-inner{flex-direction:column;align-items:flex-start}
-  .calc-inp{width:100%}
-  .s-row{flex-direction:column}
-}
+.ft{font-size:10px;color:var(--dim);}
 </style>
 </head>
 <body>
@@ -281,7 +263,7 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--rim);display:
       <div class="panel-line"></div>
       <div class="p-hdr"><span style="font-size:13px">🔍</span><span class="p-title">도시 시간 검색</span></div>
       <div class="s-row">
-        <input class="s-inp" id="sIn" type="text" placeholder="Tokyo, Paris, New York…" autocomplete="off">
+        <input class="s-inp" id="sIn" type="text" placeholder="Tokyo, Paris, New York, Rome…" autocomplete="off">
         <button class="s-btn" onclick="doSearch()">검색</button>
       </div>
       <div class="chips">
@@ -290,6 +272,8 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--rim);display:
         <span class="chip" onclick="qs('Delhi')">Delhi</span>
         <span class="chip" onclick="qs('Brisbane')">Brisbane</span>
         <span class="chip" onclick="qs('Canberra')">Canberra</span>
+        <span class="chip" onclick="qs('Rome')">Rome</span>
+        <span class="chip" onclick="qs('Osaka')">Osaka</span>
       </div>
       <div class="r-list" id="rList"><div class="r-empty">검색한 도시의 현재 시간이<br>여기에 표시됩니다</div></div>
     </div>
@@ -329,7 +313,7 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--rim);display:
 </div>
 
 <script>
-// ── DATA SYSTEM (신규 5개 도시 추가 통합) ──────────────────────────────────────────
+// ── DATA SYSTEM (요청 도시 정밀 좌표 동기화) ──────────────────────────────────────────
 const REGIONS = [
   { id:'am', label:'Americas', cities:[
     { name:'Los Angeles',       country:'USA',            tz:'America/Los_Angeles',   lat:34.052,  lon:-118.244 },
@@ -365,29 +349,27 @@ const REGIONS = [
 const SEOUL = { name:'Seoul', country:'South Korea', tz:'Asia/Seoul', lat:37.566, lon:126.978 };
 const RC = { am:'#5b9cf6', eu:'#9d7cf5', me:'#f5a541', as:'#3ecfaa', kr:'#f06292' };
 
-// 검색 색인 고도화 사전
+// 글로벌 마스터 검색 색인 사전 (Rome, Osaka 오류 원천 차단형)
 const GLOBAL_CITY_MAP = {
   'abuja': {name:'Abuja', country:'Nigeria', tz:'Africa/Lagos'},
   'port louis': {name:'Port Louis', country:'Mauritius', tz:'Indian/Mauritius'},
   'delhi': {name:'Delhi', country:'India', tz:'Asia/Kolkata'},
   'brisbane': {name:'Brisbane', country:'Australia', tz:'Australia/Brisbane'},
   'canberra': {name:'Canberra', country:'Australia', tz:'Australia/Canberra'},
+  'rome': { name: 'Rome', country: 'Italy', tz: 'Europe/Rome' },
+  'osaka': { name: 'Osaka', country: 'Japan', tz: 'Asia/Tokyo' },
   'tokyo':{name:'Tokyo',country:'Japan',tz:'Asia/Tokyo'},
   'new york':{name:'New York',country:'USA',tz:'America/New_York'},
   'london':{name:'London',country:'UK',tz:'Europe/London'},
   'singapore':{name:'Singapore',country:'Singapore',tz:'Asia/Singapore'},
   'bangkok':{name:'Bangkok',country:'Thailand',tz:'Asia/Bangkok'},
   'cairo':{name:'Cairo',country:'Egypt',tz:'Africa/Cairo'},
-  'são paulo':{name:'São Paulo',country:'Brazil',tz:'America/Sao_Paulo'},
   'paris':{name:'Paris',country:'France',tz:'Europe/Paris'},
   'berlin':{name:'Berlin',country:'Germany',tz:'Europe/Berlin'},
   'amsterdam':{name:'Amsterdam',country:'Netherlands',tz:'Europe/Amsterdam'},
-  'rome':{name:'Rome',country:'Italy',tz:'Europe/Rome'},
-  'osaka':{name:'Osaka',country:'Japan',tz:'Asia/Tokyo'},
-  'seoul':{name:'Seoul',country:'South Korea',tz:'Asia/Seoul'},
+  'seoul':{name:'Seoul',country:'South Korea',tz:'Asia/Seoul'}
 };
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
 let calcOff = 0, searched = [], hov = null;
 
 const getNow = () => new Date(Date.now() + calcOff);
@@ -396,6 +378,7 @@ const ll2xy = (lat,lon) => ({ x:(lon+180)/360*1000, y:(90-lat)/180*500 });
 const fmtT  = (d,tz) => d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
 const fmtTS = (d,tz) => d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false});
 const fmtD  = (d,tz) => d.toLocaleDateString('en-GB',{timeZone:tz,weekday:'short',month:'short',day:'numeric'});
+
 function isWork(d,tz){
   try {
     const p=d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).split(':');
@@ -492,7 +475,14 @@ function buildRegions(){
     sec.appendChild(grid); el.appendChild(sec);
   });
 
-  selectOptions.sort((a, b) => a.name.localeCompare(b.name)).forEach(c => {
+  // 역산 선택 상자 정렬 및 강제 주입 통합
+  const extraOptions = [
+    { name: 'Rome', tz: 'Europe/Rome' },
+    { name: 'Osaka', tz: 'Asia/Tokyo' }
+  ];
+  const finalOptions = [...selectOptions, ...extraOptions];
+
+  finalOptions.sort((a, b) => a.name.localeCompare(b.name)).forEach(c => {
     const opt = document.createElement('option'); opt.value = c.tz; opt.textContent = `${c.name} (${getOff(c.tz)})`;
     select.appendChild(opt);
   });
