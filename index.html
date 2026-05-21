@@ -66,7 +66,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 /* RIGHT COL */
 .right{display:flex;flex-direction:column;gap:12px}
 
-/* SEOUL */
+/* SEOUL Base */
 .seoul-panel{background:var(--card);border:1px solid rgba(240,98,146,.2);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden}
 .seoul-panel .panel-line{background:linear-gradient(90deg,transparent,var(--c5),transparent);opacity:.6}
 .s-tag{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--c5);opacity:.85}
@@ -80,7 +80,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .s-badge.off{color:var(--dim);border-color:var(--rim)}
 .sdot{width:4px;height:4px;border-radius:50%}
 
-/* SEARCH */
+/* SEARCH PANEL */
 .search-panel .panel-line{background:linear-gradient(90deg,transparent,var(--c3),transparent);opacity:.4}
 .s-row{display:flex;gap:7px;margin-bottom:9px}
 .s-inp{flex:1;background:var(--card2);border:1px solid var(--rim);border-radius:8px;color:var(--hi);font-family:'Syne',sans-serif;font-size:13px;padding:8px 11px;outline:none;transition:border-color .15s,box-shadow .15s}
@@ -95,7 +95,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 @keyframes fadeup{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .ri-info{flex:1;min-width:0}
 .ri-city{font-size:12px;font-weight:700;color:var(--hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ri-ctry{font-size:9px;color:var(--muted);margin-top:2px;}
+.ri-ctry{font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:.04em}
 .ri-r{text-align:right;flex-shrink:0}
 .ri-time{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--c4)}
 .ri-date{font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px}
@@ -139,7 +139,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 .region-as .rg-dot{background:var(--c4)}
 .city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:8px}
 .c-card{background:var(--card);border:1px solid var(--rim);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;transition:0.2s;animation:fadeup .35s ease both}
-.c-card:hover{background:var(--card2);transform:translateY(-2px)}
+.c-card:hover { background:var(--card2); border-color:var(--rim2); transform:translateY(-2px); }
 .c-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;}
 .c-card:hover::after{opacity:1}
 .region-am .c-card::after{background:linear-gradient(90deg,transparent,var(--c1),transparent)}
@@ -263,7 +263,7 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--rim);display:
       <div class="panel-line"></div>
       <div class="p-hdr"><span style="font-size:13px">🔍</span><span class="p-title">도시 시간 검색</span></div>
       <div class="s-row">
-        <input class="s-inp" id="sIn" type="text" placeholder="Tokyo, Paris, New York, Rome…" autocomplete="off">
+        <input class="s-inp" id="sIn" type="text" placeholder="Tokyo, Paris, New York, Rome, Osaka..." autocomplete="off">
         <button class="s-btn" onclick="doSearch()">검색</button>
       </div>
       <div class="chips">
@@ -313,7 +313,7 @@ footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--rim);display:
 </div>
 
 <script>
-// ── DATA SYSTEM (요청 도시 정밀 좌표 동기화) ──────────────────────────────────────────
+// ── DATA SYSTEM (추가 도시들의 메인 뷰 데이터 동기화 완료) ─────────────────────
 const REGIONS = [
   { id:'am', label:'Americas', cities:[
     { name:'Los Angeles',       country:'USA',            tz:'America/Los_Angeles',   lat:34.052,  lon:-118.244 },
@@ -349,7 +349,7 @@ const REGIONS = [
 const SEOUL = { name:'Seoul', country:'South Korea', tz:'Asia/Seoul', lat:37.566, lon:126.978 };
 const RC = { am:'#5b9cf6', eu:'#9d7cf5', me:'#f5a541', as:'#3ecfaa', kr:'#f06292' };
 
-// 글로벌 마스터 검색 색인 사전 (Rome, Osaka 오류 원천 차단형)
+// 글로벌 마스터 검색 인덱스 사전
 const GLOBAL_CITY_MAP = {
   'abuja': {name:'Abuja', country:'Nigeria', tz:'Africa/Lagos'},
   'port louis': {name:'Port Louis', country:'Mauritius', tz:'Indian/Mauritius'},
@@ -475,7 +475,6 @@ function buildRegions(){
     sec.appendChild(grid); el.appendChild(sec);
   });
 
-  // 역산 선택 상자 정렬 및 강제 주입 통합
   const extraOptions = [
     { name: 'Rome', tz: 'Europe/Rome' },
     { name: 'Osaka', tz: 'Asia/Tokyo' }
@@ -525,7 +524,7 @@ function doSearch(){
 }
 function renderSearch(){
   const el=document.getElementById('rList');
-  if(!searched.length){ el.innerHTML='<div class="r-empty">검색 결과가 표시됩니다</div>'; return; }
+  if(!searched.length){ el.innerHTML='<div class="r-empty">검색한 도시의 현재 시간이<br>여기에 표시됩니다</div>'; return; }
   el.innerHTML='';
   searched.forEach((c,i)=>{
     const item=document.createElement('div'); item.className='r-item';
